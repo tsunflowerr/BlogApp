@@ -115,3 +115,60 @@ export async function updateUser(req, res) {
     }
     
 }
+
+export async function deleteUser(req, res) {
+    try {
+        const userIdtoDelete = req.params.id || req.user.id;
+        if(req.params.id && req.params.id !== req.user.id && !req.user.isAdmin) {
+            return res.status(403).json({success: false, message: 'Access denied. Admins only.'});
+        }
+        const deleteUser = await User.findByIdAndDelete(userIdtoDelete);
+        if(!deleteUser) {
+            return res.status(404).json({success:false, message:'User not found'})
+        }
+        res.status(200).json({success:true, message:'User deleted successfully'});
+    }
+    catch(error) {
+        console.log('Error deleting user:', error);
+        res.status(500).json({success: false, message: 'Server error'});
+    }
+}
+
+export async function getAllUsers(req, res) {
+    try {
+        const users = await User.find().select('username email isAdmin createdAt');
+        res.status(200).json({success:true, users});
+    }
+    catch(error) {
+        console.log('Error fetching users:', error);
+        res.status(500).json({success: false, message: 'Server error'});
+    }
+}
+
+export async function changePassword(req, res) {
+    const {oldPassword, newPassword} = req.body;
+    if(!oldPassword || !newPassword) {
+        return res.status(400).json({success: false, message: 'Please fill all fields'});
+    }
+    if(newPassword.length < 6) {
+        return res.status(400).json({success: false, message: "new password must be at least 6 characters long"});
+    }
+    try {
+        const user = await User.findById(req.user.id).select('password');
+        if(!user) {
+            return res.status(404).json({success:false, message:'User not found'})
+        }
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if(!isMatch) {
+            return res.status(400).json({success:false, message:"Invalid old password"});
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+        res.status(200).json({success:true, message:"Password changed successfully"});
+    }
+    catch(error) {
+        console.log('Error changing password:', error);
+        res.status(500).json({success: false, message: 'Server error'});
+    }
+}
