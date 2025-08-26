@@ -30,7 +30,7 @@ export async function registerUser(req, res) {
         const newUser = new User({userName, email, password: hashedPassword});
         const token = createToken(newUser._id);
 
-        req.status(201).json({
+        res.status(201).json({
             success: true,
             token,
             newUser: {
@@ -80,7 +80,7 @@ export async function loginUser(req, res) {
 
 export async function getCurrentUser(req, res) {
     try {
-        const user = await User.findById(req.user.id).select('name email');
+        const user = await User.findById(req.user.id).select('username email');
         if(!user) {
             return res.status(404).json({success:false, message:'User not found'})
         }
@@ -106,7 +106,7 @@ export async function updateUser(req, res) {
         if(exist) {
             return res.status(400).json({success: false, message: "Email already in use"});
         }
-        const user = await User.findByIdandUpdate(req.user.id, {name, email}, {new: true}).select('name email');
+        const user = await User.findByIdAndUpdate(req.user.id, {name, email}, {new: true}).select('name email');
         res.status(200).json({success: true, user});
     }
     catch(error) {
