@@ -1,4 +1,4 @@
-import User from '../models/User.js';
+import User from '../models/userModel.js';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -11,8 +11,8 @@ const createToken = (userId) => {
 }
 
 export async function registerUser(req, res) {
-    const {userName, email, password} = req.body;
-    if(!userName || !email || !password) {
+    const {username, email, password} = req.body;
+    if(!username || !email || !password) {
         return res.status(400).json({success: false, message: 'All fields are required'});
     }
     if(!validator.isEmail(email)) {
@@ -20,25 +20,25 @@ export async function registerUser(req, res) {
     }
     if(password.length < 6) {
         return res.status(400).json({success: false, message: "Password must be at least 6 characters long"});
-    }
+    }       
     try {
         if(await User.findOne({email})) {
             return res.status(400).json({success: false, message: "Email already in use"});
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({userName, email, password: hashedPassword});
+        const newUser = await User.create({username, email, password: hashedPassword});
         const token = createToken(newUser._id);
-
         res.status(201).json({
             success: true,
             token,
             newUser: {
                 id: newUser._id,
-                userName: newUser.userName,
+                username: newUser.username,
                 email: newUser.email
             },
         })
+
     }
     catch(error) {
         console.error('Error registering user:', error);
@@ -67,7 +67,7 @@ export async function loginUser(req, res) {
             token,
             user: {
                 id: user._id,
-                userName: user.userName,
+                username: user.username,
                 email: user.email
             }
         })
@@ -95,7 +95,7 @@ export async function getCurrentUser(req, res) {
 export async function updateUser(req, res) {
 
     const {name, email} = req.body;
-    if(!name || !email) {
+    if(!name && !email) {
         return res.status(400).json({success: false, message: 'Please fill all fields'});
     }
     if(!validator.isEmail(email)) {
@@ -106,7 +106,7 @@ export async function updateUser(req, res) {
         if(exist) {
             return res.status(400).json({success: false, message: "Email already in use"});
         }
-        const user = await User.findByIdAndUpdate(req.user.id, {name, email}, {new: true}).select('name email');
+        const user = await User.findByIdAndUpdate(req.user.id, {name, email}, {new: true}).select('username email');
         res.status(200).json({success: true, user});
     }
     catch(error) {

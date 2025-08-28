@@ -1,4 +1,5 @@
-import categoryModel from "../models/categoryModel";
+import categoryModel from "../models/categoryModel.js";
+import postModel from "../models/postModel.js";
 
 export async function createCategory(req, res) {
     try {
@@ -79,6 +80,10 @@ export async function deleteCategory(req, res) {
         if(!deletedCategory) {  
             return res.status(404).json({success: false, message: 'Category not found'});
         }
+        await postModel.updateMany(
+            { category: categoryId },
+            { $pull: { category: categoryId }}
+        );
         res.status(200).json({success: true, message: 'Category deleted successfully'});
     }
     catch(error) {

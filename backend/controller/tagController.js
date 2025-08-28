@@ -1,4 +1,5 @@
-import tagModel from "../models/tagModel";
+import tagModel from "../models/tagModel.js";
+import postModel from "../models/postModel.js";
 
 export async function createTag(req, res) {
     try {
@@ -58,6 +59,10 @@ export async function updateTag(req, res) {
         const updateTag = await tagModel.findByIdAndUpdate(
             tagId, {name, slug}, {new: true, runValidators: true}
         )
+        if(!updateTag) {
+            return res.status(404).json({success: false, message: 'Tag not found'});
+        }
+        res.status(200).json({success: true, tag: updateTag});
     }
     catch(error) {
         console.error('Error updating tag:', error)
@@ -72,6 +77,10 @@ export async function deleteTag(req, res) {
         if(!tag) {
             return res.status(404).json({success: false, message: 'Tag not found'});
         }
+        await postModel.updateMany(
+            { tags: tagId },
+            { $pull: { tags: tagId } }
+        );
         res.status(200).json({success: true, message: 'Tag deleted successfully'});
     }
     catch(error) {

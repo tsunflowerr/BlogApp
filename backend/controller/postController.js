@@ -1,8 +1,10 @@
-import Post from '../models/Post.js';
+import Post from '../models/postModel.js';
+import Category from '../models/categoryModel.js';
+import Tag from '../models/tagModel.js';
 
 export async function createPost(req, res) {
     try {
-        const {title, content, tags, thumbnail} = req.body;
+        const {title, content, tags, category, thumbnail} = req.body;
         if(!title || !content ) {
             return res.status(400).json({success: false, message: 'Title and content are required'});
         }
@@ -11,6 +13,7 @@ export async function createPost(req, res) {
             content,
             author: req.user._id,
             tags: tags || [],
+            category : category || null,
             thumbnail: thumbnail || '',
         })
         const saved = await post.save();
@@ -24,7 +27,11 @@ export async function createPost(req, res) {
 
 export async function getAllPosts(req, res) {
     try {
-        const posts = await Post.find().populate('author', 'userName email').sort({createAt: -1});
+        const {category, tag} = req.query;
+        let filter = {};    
+        if(category) filter.category = category;
+        if(tag) filter.tags = tag;
+        const posts = await Post.find().populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug').sort({createAt: -1});
         if(!posts) {
             return res.status(404).json({success: false, message: 'No posts found'});
         }
@@ -39,7 +46,7 @@ export async function getAllPosts(req, res) {
 export async function getPostsByUser(req, res) {
     try {
         const userId = req.params.userId;
-        const posts = await Post.find({author: userId}).populate('author', 'userName email').sort({createAt: -1});
+        const posts = await Post.find({author: userId}).populate('author', 'username email').sort({createAt: -1});
         if(!posts) {
             return res.status(404).json({success: false, message: 'No posts found for this user'});
         }
@@ -53,10 +60,12 @@ export async function getPostsByUser(req, res) {
 
 export async function getPostById(req, res) {
     try {
-        const post = await Post.findOne({_id: req.params.postId, author: req.user._id}).populate('author', 'userName email');
+        const post = await Post.findOne({ _id: req.params.postId }).populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug');
         if(!post) {
             return res.status(404).json({success: false, message: 'Post not found'});
         }
+        post.viewCount = (post.viewCount || 0) + 1;
+        await post.save();
         res.status(200).json({success: true, post});
     }
     catch(error) {
@@ -71,7 +80,7 @@ export async function updatePost(req, res) {
         const updatedPost = await Post.findOneAndUpdate({
             _id: req.params.postId,
             author: req.user._id
-        }, data, {new: true, runValidators: true});
+        }, data, {new: true, runValidators: true}).populate('category', 'name slug').populate('tags', 'name slug');
         if(!updatedPost)
             return res.status(404).json({success: false, message: 'Post not found or unauthorized'});
         res.status(200).json({success: true, post: updatedPost});
@@ -97,6 +106,73 @@ export async function deletePost(req, res) {
     }
     catch(error) {
         console.error('Error deleting post:', error);
+        res.status(500).json({success: false, message: 'Server error'});
+    }
+}
+
+export async function getPostByCategorySlug(req, res) {
+    try {
+        const slug = req.params.slug;
+        const category = await Category.find({slug: slug});
+        if(!category) {
+            return res.status(404).json({success: false, message: 'Category not found'});
+        }
+        const posts = await Post.find({category: category._id}).populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug').sort({createAt: -1});
+        if(!posts || posts.length === 0) {
+            return res.status(404).json({success: false, message: 'No posts found for this category'});
+        }
+        res.status(200).json({success: true, posts});
+    }
+    catch(error) {
+        console.error('Error fetching posts by category slug:', error);
+        res.status(500).json({success: false, message: 'Server error'});
+    }
+}
+
+export async function getPostByTagSlug(req, res) {
+    try {
+        const slug = req.params.slug;
+        const tag = await Tag.find({slug: slug});
+        if(!tag) {
+            return res.status(404).json({success: false, message: 'Category not found'});
+        }
+        const posts = await Post.find({tag: tag._id}).populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug').sort({createAt: -1});
+        if(!posts || posts.length === 0) {
+            return res.status(404).json({success: false, message: 'No posts found for this tag'});
+        }
+        res.status(200).json({success: true, posts});
+    }
+    catch(error) {
+        console.error('Error fetching posts by category slug:', error);
+        res.status(500).json({success: false, message: 'Server error'});
+    }
+}
+
+export async function likePost(req, res) {
+    try {
+        const postId = req.params.postId;
+        const userId = req.user?._id;
+        if(!userId) {
+            return res.status(401).json({success: false, message: 'Unauthorized'});
+        }
+        const post = await Post.findById(postId);
+        if(!post) {
+            return res.status(404).json({success: false, message: 'Post not found'});
+        }
+        if(post.likes.includes(userId)) {
+            post.likes.pull(userId);
+            post.likeCount = (post.likeCount || 0) - 1;
+            await post.save();
+            return res.status(200).json({success: true, message: 'Post unliked', likes: post.likes, likeCount: post.likeCount});
+        } else {
+            post.likes.push(userId);
+            post.likeCount = (post.likeCount || 0) + 1;
+            await post.save();
+            return res.status(200).json({success: true, message: 'Post liked', likes: post.likes, likeCount: post.likeCount});
+        }
+    }
+    catch(error) {
+        console.error('Error liking/unliking post:', error);
         res.status(500).json({success: false, message: 'Server error'});
     }
 }
