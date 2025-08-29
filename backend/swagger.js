@@ -11,7 +11,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3000/api', // đổi nếu cần
+      url: 'http://localhost:4000/api', // đổi nếu cần
       description: 'Local server'
     }
   ],
