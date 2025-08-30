@@ -22,7 +22,7 @@ const Login = ({onSubmit, onSwitchMode}) => {
         if(token) {
             (async () => {
                 try {
-                    const {data} = await axios.get(`${url}/api/users/me}`, {
+                    const {data} = await axios.get(`${url}/api/users/me`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }

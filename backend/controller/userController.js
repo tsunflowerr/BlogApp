@@ -94,8 +94,8 @@ export async function getCurrentUser(req, res) {
 
 export async function updateUser(req, res) {
 
-    const {name, email} = req.body;
-    if(!name && !email) {
+    const {username, email} = req.body;
+    if(!username && !email) {
         return res.status(400).json({success: false, message: 'Please fill all fields'});
     }
     if(!validator.isEmail(email)) {
@@ -106,7 +106,7 @@ export async function updateUser(req, res) {
         if(exist) {
             return res.status(400).json({success: false, message: "Email already in use"});
         }
-        const user = await User.findByIdAndUpdate(req.user.id, {name, email}, {new: true}).select('username email');
+        const user = await User.findByIdAndUpdate(req.user.id, {username, email}, {new: true}).select('username email');
         res.status(200).json({success: true, user});
     }
     catch(error) {

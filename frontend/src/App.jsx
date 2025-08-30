@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Login from "./components/Login.jsx";
 import SignUp from "./components/SignUp.jsx";
 import { useState } from "react";
+import Navbar from "./components/Navbar.jsx"
 
 const App = () => {
   const navigate = useNavigate();
@@ -24,12 +25,18 @@ const App = () => {
   const handleAuthSubmit = (data) => {
     const userData = {
       email: data.email,
-      name: data.name || "User",
-      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || "User")}&background=random`
+      name: data.username || "User",
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || "User")}&background=random`
     }
     setCurrentUser(userData);
     navigate('/', {replace: true})
   }
+
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    setCurrentUser(null)
+  }
+
   return (
     <Routes>
       <Route path='/login' element={<div className="fixed inset-0 bg-gradient-to-tr from-green-50 to-sky-50 flex items-center
@@ -40,6 +47,8 @@ const App = () => {
       justify-center">
         <SignUp onSwitchMode ={() => navigate('/login')}/>
       </div>} />
+      <Route path="/" element = {<Navbar user={currentUser}  onLogout={handleLogout}/>}/>
+
     </Routes>
   )
 }
