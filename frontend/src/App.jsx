@@ -1,10 +1,17 @@
 import { useEffect } from "react";
-import {Route, Routes} from "react-router-dom"
+import {Outlet, Route, Routes} from "react-router-dom"
 import { useNavigate } from "react-router-dom";
 import Login from "./components/Login.jsx";
 import SignUp from "./components/SignUp.jsx";
 import { useState } from "react";
 import Navbar from "./components/Navbar.jsx"
+import Dashboard from "./pages/Dashboard.jsx";
+import Trending from "./pages/Trending.jsx";
+import { Navigate } from "react-router-dom";
+import Following from "./pages/Following.jsx";
+import Layout from "./components/Layout.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   const navigate = useNavigate();
@@ -29,27 +36,50 @@ const App = () => {
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || "User")}&background=random`
     }
     setCurrentUser(userData);
-    navigate('/', {replace: true})
   }
 
   const handleLogout = () => {
     localStorage.removeItem("token")
     setCurrentUser(null)
+    navigate('/');
   }
 
   return (
-    <Routes>
-      <Route path='/login' element={<div className="fixed inset-0 bg-gradient-to-tr from-green-50 to-sky-50 flex items-center
-      justify-center">
-        <Login onSubmit={handleAuthSubmit}  onSwitchMode ={() => navigate('/signup')}/>
-      </div>} />
-      <Route path='/signup' element={<div className="fixed inset-0 bg-gradient-to-tr from-green-50 to-sky-50 flex items-center
-      justify-center">
-        <SignUp onSwitchMode ={() => navigate('/login')}/>
-      </div>} />
-      <Route path="/" element = {<Navbar user={currentUser}  onLogout={handleLogout}/>}/>
+    <>
+      <ToastContainer position="top-right" />
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <div className="fixed inset-0 bg-gradient-to-tr from-green-50 to-sky-50 flex items-center justify-center">
+              <Login onSubmit={handleAuthSubmit} onSwitchMode={() => navigate("/signup")} />
+            </div>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <div className="fixed inset-0 bg-gradient-to-tr from-green-50 to-sky-50 flex items-center justify-center">
+              <SignUp onSwitchMode={() => navigate("/login")} />
+            </div>
+          }
+        />
 
-    </Routes>
-  )
-}
+        {/* Layout áp dụng cho các route bình thường */}
+        <Route element={<Layout user={currentUser} onLogout={handleLogout} />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/trending" element={<Trending />} />
+          <Route
+            path="/follower"
+            element={
+              <ProtectedRoute currentUser={currentUser}>
+                <Following />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+      </Routes>
+    </>
+  );
+};
 export default App

@@ -1,12 +1,12 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {toast, ToastContainer}  from "react-toastify"
 import { FaBlogger } from "react-icons/fa6"
 import {Lock, Mail, Eye, EyeOff, LogIn} from "lucide-react"
 
-
+const url = "http://localhost:4000"
 const INITIAL_FORM = {email: "", password: ""}
 const Login = ({onSubmit, onSwitchMode}) => {
     const [showPassword, setShowPassword] = React.useState(false);
@@ -14,7 +14,8 @@ const Login = ({onSubmit, onSwitchMode}) => {
     const [formData, setFormData] = React.useState(INITIAL_FORM)
     const navigate = useNavigate(); 
     const [rememberMe, setRememberMe] = React.useState(false);
-    const url = "http://localhost:4000"
+    const location = useLocation()
+    const from = location.state?.from || "/";
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -27,10 +28,10 @@ const Login = ({onSubmit, onSwitchMode}) => {
                             Authorization: `Bearer ${token}`
                         }
                     });
-                    if(data.success) {
+                    if(data?.success) {
                         onSubmit?.({token, userId, ...data.user});
                         toast.success("Session restored successfully")
-                        navigate('/');
+                        navigate(from, {replace: true})
                     }
                     else {
                         localStorage.clear()
@@ -43,7 +44,7 @@ const Login = ({onSubmit, onSwitchMode}) => {
                 }
             })()
         };
-    }, [navigate, onSubmit])
+    }, [navigate, onSubmit, from])
 
     const handleSubmit = async(e) => {
         e.preventDefault();
@@ -61,7 +62,7 @@ const Login = ({onSubmit, onSwitchMode}) => {
             setFormData(INITIAL_FORM)
             onSubmit?.({token:data.token, userId:data.user.id, ...data.user});
             toast.success("Login successful")
-            setTimeout(() => navigate("/"), 1000);
+            navigate(from, {replace: true})
         }
         catch(error) {
             const msg = error.response?.data?.message || error.message

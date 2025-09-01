@@ -113,11 +113,11 @@ export async function deletePost(req, res) {
 export async function getPostByCategorySlug(req, res) {
     try {
         const slug = req.params.slug;
-        const category = await Category.find({slug: slug});
+        const category = await Category.findOne({slug});
         if(!category) {
             return res.status(404).json({success: false, message: 'Category not found'});
         }
-        const posts = await Post.find({category: category._id}).populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug').sort({createAt: -1});
+        const posts = await Post.find({category: category._id}).populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug').sort({createdAt: -1});
         if(!posts || posts.length === 0) {
             return res.status(404).json({success: false, message: 'No posts found for this category'});
         }
@@ -132,18 +132,18 @@ export async function getPostByCategorySlug(req, res) {
 export async function getPostByTagSlug(req, res) {
     try {
         const slug = req.params.slug;
-        const tag = await Tag.find({slug: slug});
+        const tag = await Tag.findOne({slug});
         if(!tag) {
-            return res.status(404).json({success: false, message: 'Category not found'});
+            return res.status(404).json({success: false, message: 'tag not found'});
         }
-        const posts = await Post.find({tag: tag._id}).populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug').sort({createAt: -1});
+        const posts = await Post.find({tags: tag._id}).populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug').sort({createdAt: -1});
         if(!posts || posts.length === 0) {
             return res.status(404).json({success: false, message: 'No posts found for this tag'});
         }
         res.status(200).json({success: true, posts});
     }
     catch(error) {
-        console.error('Error fetching posts by category slug:', error);
+        console.error('Error fetching posts by tag slug:', error);
         res.status(500).json({success: false, message: 'Server error'});
     }
 }
@@ -176,3 +176,46 @@ export async function likePost(req, res) {
         res.status(500).json({success: false, message: 'Server error'});
     }
 }
+
+export const getPostCountByCategory = async (req, res) => {
+  try {
+    const result = await Post.aggregate([
+      { $unwind: "$category" }, 
+      {
+        $group: {
+          _id: "$category",
+          totalPosts: { $sum: 1 }
+        }
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "_id",
+          as: "categoryInfo"
+        }
+      },
+      { $unwind: "$categoryInfo" },
+      {
+        $project: {
+          _id: 0,
+          categoryId: "$categoryInfo._id",
+          name: "$categoryInfo.name",
+          slug: "$categoryInfo.slug",
+          totalPosts: 1
+        }
+      },
+      { $sort: { totalPosts: -1 } },
+      { $limit: 5 }
+    ]);
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ success: false, message: "No categories found" });
+    }
+
+    res.status(200).json({ success: true, categories: result });
+  } catch (error) {
+    console.error("Error fetching category stats:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

@@ -7,6 +7,7 @@ import { IoMdTrendingUp } from "react-icons/io";
 import { RiUserFollowFill } from "react-icons/ri";
 import { LogOut, ChevronDown, Settings } from "lucide-react";
 import { IoNotifications } from "react-icons/io5";
+import { NavLink } from "react-router-dom";
 
 
 const Navbar = ({user=null, onLogout}) => {
@@ -34,36 +35,81 @@ const Navbar = ({user=null, onLogout}) => {
     },[])
     return (
         <header className="sticky top-0 bg-white shadow-sm font-sans border-b border-gray-200 z-50">
-            <div className="px-4 md:px-6 w-full mx-auto items-center flex flex-row">
-                <div className="flex py-2 justify-start items-center gap-5 flex-1">
+            <div className="px-4 md:px-6 w-full mx-auto items-center flex">
+                <div className="flex py-2 items-center md:gap-5 gap-1 flex-1">
                     <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
                         <div className="flex items-center justify-center">
                             <FaBlogger className="w-10 h-10 text-blue-500"/>
                         </div>
-                        <span className="text-center items-center text-2xl font-extrabold hidden sm:block text-blue-500">Blog</span>
+                        <span className="text-center items-center text-2xl font-extrabold hidden lg:block text-blue-500">Blog</span>
                     </div>
-                    <div className="relative flex-1 max-w-md">
+                    <div className="relative flex-1 max-w-sm">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <IoSearchOutline className="w-4 h-4 text-gray-400" />
                         </div>
                         <input type="search" name="q" placeholder="Tìm kiếm trên Blog..." className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-gray-100 appearance-none focus:bg-white text-sm"></input>
                     </div>
                 </div>
-                <div className="flex justify-start w-full items-center gap-1 sm:gap-10 pt-2 flex-1">
-                    <div className={`flex items-center justify-center sm:w-28 w-20 h-12 gap-1 cursor-pointer transition-colors relative ${location.pathname === '/' ? 'text-blue-500 border-b-blue-500 border-b-4' : 'text-gray-600 rounded-lg hover:bg-gray-100'}`}  onClick={() => navigate('/')}>
-                        <AiFillHome className="md:w-8 md:h-8 hidden sm:block"/>
-                        <p className="text-center mt-1 font-bold sm:text-md text-sm">Home</p>
-                    </div>
-                    <div className={`flex items-center justify-center sm:w-28 w-20  h-12 gap-2 cursor-pointer transition-colors relative ${location.pathname === '/trending' ? 'text-blue-500 border-b-blue-500 border-b-4' : 'text-gray-600 rounded-lg hover:bg-gray-100'}`}  onClick={() => navigate('/trending')}>
-                        <IoMdTrendingUp className="sm:w-8 sm:h-8 hidden sm:block"/>
-                        <p className="text-center mt-1 font-bold sm:text-md text-sm">Trending</p>
-                    </div>
-                    <div className={`flex items-center justify-center sm:w-28 w-20 h-12 gap-2  cursor-pointer transition-colors relative ${location.pathname === '/follower' ? 'text-blue-500 border-b-blue-500 border-b-4' : 'text-gray-600 rounded-lg hover:bg-gray-100'}`}  onClick={() => navigate('/follower')}>
-                        <RiUserFollowFill className="sm:w-8 md:h-8 hidden sm:block"/> 
-                        <p className="text-center mt-1 font-bold sm:text-md text-sm">Follower</p>
-                    </div>
+                <div className="flex items-center gap-1 lg:gap-10 pt-2 flex-1 2xl:mr-60">
+      
+                    {/* Home */}
+                    <NavLink 
+                            to="/" 
+                            end
+                            className={({ isActive }) => 
+                            `flex items-center justify-center lg:w-28 w-18 h-12 gap-3 cursor-pointer transition-colors relative ${
+                                isActive 
+                                ? "text-blue-500 border-b-blue-500 border-b-4" 
+                                : "text-gray-600 rounded-lg hover:bg-gray-100"
+                            }`
+                            } >
+                            <AiFillHome className="lg:w-6 lg:h-6 hidden lg:block"/>
+                            <p className="text-center mt-1 font-bold lg:text-md text-sm">Home</p>
+                    </NavLink>
+
+                    {/* Trending */}
+                    <NavLink 
+                        to="/trending" 
+                        className={({ isActive }) => 
+                        `flex items-center justify-center lg:w-28 w-18 h-12 gap-4 cursor-pointer transition-colors relative ${
+                            isActive 
+                            ? "text-blue-500 border-b-blue-500 border-b-4" 
+                            : "text-gray-600 rounded-lg hover:bg-gray-100"
+                        }`
+                        }>
+                        <IoMdTrendingUp className="lg:w-6 lg:h-6 hidden lg:block"/>
+                        <p className="text-center mt-1 font-bold lg:text-md text-sm">Trending</p>
+                    </NavLink>
+
+                    {/* Follower */}
+                    <NavLink 
+                        to="/follower" 
+                        className={({ isActive }) => 
+                        `flex items-center justify-center lg:w-28 w-18 h-12 gap-3 cursor-pointer transition-colors relative ${
+                            isActive 
+                            ? "text-blue-500 border-b-blue-500 border-b-4" 
+                            : "text-gray-600 rounded-lg hover:bg-gray-100"
+                        }`
+                        }>
+                        <RiUserFollowFill className="lg:w-6 lg:h-6 hidden lg:block"/> 
+                        <p className="text-center mt-1 font-bold lg:text-md text-sm">Follower</p>
+                    </NavLink>
+
+                    <NavLink 
+                        to="/follower" 
+                        className={({ isActive }) => 
+                        `flex items-center justify-center lg:w-28 w-18 h-12 gap-3 cursor-pointer transition-colors relative ${
+                            isActive 
+                            ? "text-blue-500 border-b-blue-500 border-b-4" 
+                            : "text-gray-600 rounded-lg hover:bg-gray-100"
+                        }`
+                        }>
+                        <RiUserFollowFill className="lg:w-6 lg:h-6 hidden lg:block"/> 
+                        <p className="text-center mt-1 font-bold lg:text-md text-sm">Follower</p>
+                    </NavLink>
+
                 </div>
-                <div className="flex items-center justify-end gap-1">
+                <div className="flex items-center  gap-1">
                     {isLoggedIn ? (
                         <> 
                             <button className="p-2 text-gray-600 hover:text-blue-500 transition-colors duration-300 hover:bg-blue-50 rounded-full

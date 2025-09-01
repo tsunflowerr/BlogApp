@@ -1,5 +1,5 @@
 import express from "express";
-import { getPostById, createPost, getPostsByUser, deletePost, getAllPosts, updatePost, getPostByCategorySlug, getPostByTagSlug, likePost } from "../controller/postController.js";
+import { getPostById, createPost, getPostsByUser, deletePost, getAllPosts, updatePost, getPostCountByCategory, getPostByCategorySlug, getPostByTagSlug, likePost } from "../controller/postController.js";
 import authMiddleware from "../middleware/authMiddleware.js";  
 import adminMiddleware from "../middleware/adminMiddleware.js";
 
@@ -172,4 +172,39 @@ postRouter.get('/category/:slug', getPostByCategorySlug);
  */
 postRouter.get('/tag/:slug', getPostByTagSlug);
 postRouter.post('/:postId/like', authMiddleware, likePost)
+
+
+
+/**
+ * @swagger
+ * /posts/categories/trending:
+ *   get:
+ *     summary: Lấy số lượng bài viết theo từng category
+ *     tags: [Posts]
+ *     responses:
+ *       200:
+ *         description: Danh sách category kèm số lượng bài viết
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   categoryId:
+ *                     type: string
+ *                     description: ID của category
+ *                   name:
+ *                     type: string
+ *                     description: Tên category
+ *                   slug:
+ *                     type: string
+ *                     description: Slug của category
+ *                   totalPosts:
+ *                     type: integer
+ *                     description: Tổng số bài viết thuộc category
+ *       500:
+ *         description: Lỗi server
+ */
+postRouter.get('/categories/trending', getPostCountByCategory)
 export default postRouter;
