@@ -27,7 +27,7 @@ export async function registerUser(req, res) {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({username, email, password: hashedPassword});
+        const newUser = await User.create({username, email, password: hashedPassword, avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username || "User")}&background=random`});
         const token = createToken(newUser._id);
         res.status(201).json({
             success: true,
@@ -35,7 +35,8 @@ export async function registerUser(req, res) {
             newUser: {
                 id: newUser._id,
                 username: newUser.username,
-                email: newUser.email
+                email: newUser.email,
+                avatar: newUser.avatar
             },
         })
 

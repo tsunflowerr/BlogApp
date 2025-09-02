@@ -31,7 +31,7 @@ export async function getAllPosts(req, res) {
         let filter = {};    
         if(category) filter.category = category;
         if(tag) filter.tags = tag;
-        const posts = await Post.find().populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug').sort({createAt: -1});
+        const posts = await Post.find().populate('author', 'username email avatar ').populate('category', 'name slug').populate('tags', 'name slug').sort({createAt: -1});
         if(!posts) {
             return res.status(404).json({success: false, message: 'No posts found'});
         }
@@ -46,7 +46,7 @@ export async function getAllPosts(req, res) {
 export async function getPostsByUser(req, res) {
     try {
         const userId = req.params.userId;
-        const posts = await Post.find({author: userId}).populate('author', 'username email').sort({createAt: -1});
+        const posts = await Post.find({author: userId}).populate('author', 'username email avatar').sort({createAt: -1});
         if(!posts) {
             return res.status(404).json({success: false, message: 'No posts found for this user'});
         }
@@ -60,7 +60,7 @@ export async function getPostsByUser(req, res) {
 
 export async function getPostById(req, res) {
     try {
-        const post = await Post.findOne({ _id: req.params.postId }).populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug');
+        const post = await Post.findOne({ _id: req.params.postId }).populate('author', 'username email avatar').populate('category', 'name slug').populate('tags', 'name slug');
         if(!post) {
             return res.status(404).json({success: false, message: 'Post not found'});
         }
@@ -117,7 +117,7 @@ export async function getPostByCategorySlug(req, res) {
         if(!category) {
             return res.status(404).json({success: false, message: 'Category not found'});
         }
-        const posts = await Post.find({category: category._id}).populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug').sort({createdAt: -1});
+        const posts = await Post.find({category: category._id}).populate('author', 'username email avatar').populate('category', 'name slug').populate('tags', 'name slug').sort({createdAt: -1});
         if(!posts || posts.length === 0) {
             return res.status(404).json({success: false, message: 'No posts found for this category'});
         }
@@ -136,7 +136,7 @@ export async function getPostByTagSlug(req, res) {
         if(!tag) {
             return res.status(404).json({success: false, message: 'tag not found'});
         }
-        const posts = await Post.find({tags: tag._id}).populate('author', 'username email').populate('category', 'name slug').populate('tags', 'name slug').sort({createdAt: -1});
+        const posts = await Post.find({tags: tag._id}).populate('author', 'username avatar email').populate('category', 'name slug').populate('tags', 'name slug').sort({createdAt: -1});
         if(!posts || posts.length === 0) {
             return res.status(404).json({success: false, message: 'No posts found for this tag'});
         }
@@ -163,12 +163,12 @@ export async function likePost(req, res) {
             post.likes.pull(userId);
             post.likeCount = (post.likeCount || 0) - 1;
             await post.save();
-            return res.status(200).json({success: true, message: 'Post unliked', likes: post.likes, likeCount: post.likeCount});
+            return res.status(200).json({success: true, message: 'Post unliked', _id:postId, likes: post.likes, likeCount: post.likeCount});
         } else {
             post.likes.push(userId);
             post.likeCount = (post.likeCount || 0) + 1;
             await post.save();
-            return res.status(200).json({success: true, message: 'Post liked', likes: post.likes, likeCount: post.likeCount});
+            return res.status(200).json({success: true, message: 'Post liked', _id:postId, likes: post.likes, likeCount: post.likeCount});
         }
     }
     catch(error) {

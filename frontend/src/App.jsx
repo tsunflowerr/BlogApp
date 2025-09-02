@@ -33,7 +33,9 @@ const App = () => {
     const userData = {
       email: data.email,
       name: data.username || "User",
-      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || "User")}&background=random`
+      avatar: data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || "User")}&background=random`,
+      token: data.token,
+      _id : data._id
     }
     setCurrentUser(userData);
   }

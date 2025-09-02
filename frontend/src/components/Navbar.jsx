@@ -10,7 +10,7 @@ import { IoNotifications } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
 
 
-const Navbar = ({user=null, onLogout}) => {
+const Navbar = ({user=null, onLogout, onHomeClick}) => {
     const navigate = useNavigate()
     const location = useLocation()
     const [isLoggedIn, setIsLoggedIn] = useState(!!user)
@@ -37,7 +37,7 @@ const Navbar = ({user=null, onLogout}) => {
         <header className="sticky top-0 bg-white shadow-sm font-sans border-b border-gray-200 z-50">
             <div className="px-4 md:px-6 w-full mx-auto items-center flex">
                 <div className="flex py-2 items-center md:gap-5 gap-1 flex-1">
-                    <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
+                    <div className="flex items-center gap-2 cursor-pointer group" onClick={() => {navigate('/'); onHomeClick(); window.scroll({top: 0, behavior:"smooth"}) }}>
                         <div className="flex items-center justify-center">
                             <FaBlogger className="w-10 h-10 text-blue-500"/>
                         </div>
@@ -56,8 +56,9 @@ const Navbar = ({user=null, onLogout}) => {
                     <NavLink 
                             to="/" 
                             end
+                            onClick={() => {onHomeClick() ;window.scroll({top: 0, behavior:"smooth"})}}
                             className={({ isActive }) => 
-                            `flex items-center justify-center lg:w-28 w-18 h-12 gap-3 cursor-pointer transition-colors relative ${
+                            `flex items-center justify-center lg:w-28 w-18 h-12 gap-2 cursor-pointer transition-colors relative ${
                                 isActive 
                                 ? "text-blue-500 border-b-blue-500 border-b-4" 
                                 : "text-gray-600 rounded-lg hover:bg-gray-100"
@@ -70,22 +71,24 @@ const Navbar = ({user=null, onLogout}) => {
                     {/* Trending */}
                     <NavLink 
                         to="/trending" 
+                        onClick={() => {onHomeClick(), window.scroll({top: 0, behavior:"smooth"})}}
                         className={({ isActive }) => 
-                        `flex items-center justify-center lg:w-28 w-18 h-12 gap-4 cursor-pointer transition-colors relative ${
+                        `flex items-center justify-center lg:w-28 w-18 h-12 gap-3 cursor-pointer transition-colors relative ${
                             isActive 
                             ? "text-blue-500 border-b-blue-500 border-b-4" 
                             : "text-gray-600 rounded-lg hover:bg-gray-100"
                         }`
                         }>
-                        <IoMdTrendingUp className="lg:w-6 lg:h-6 hidden lg:block"/>
+                        <IoMdTrendingUp className="lg:w-6 mt-1 lg:h-6 hidden lg:block"/>
                         <p className="text-center mt-1 font-bold lg:text-md text-sm">Trending</p>
                     </NavLink>
 
                     {/* Follower */}
                     <NavLink 
                         to="/follower" 
+                        onClick={() => {onHomeClick(), window.scroll({top: 0, behavior:"smooth"})}}
                         className={({ isActive }) => 
-                        `flex items-center justify-center lg:w-28 w-18 h-12 gap-3 cursor-pointer transition-colors relative ${
+                        `flex items-center justify-center lg:w-28 w-18 h-12 gap-2 cursor-pointer transition-colors relative ${
                             isActive 
                             ? "text-blue-500 border-b-blue-500 border-b-4" 
                             : "text-gray-600 rounded-lg hover:bg-gray-100"
@@ -97,8 +100,9 @@ const Navbar = ({user=null, onLogout}) => {
 
                     <NavLink 
                         to="/follower" 
+                        onClick={() => {onHomeClick(), window.scroll({top: 0, behavior:"smooth"})}}
                         className={({ isActive }) => 
-                        `flex items-center justify-center lg:w-28 w-18 h-12 gap-3 cursor-pointer transition-colors relative ${
+                        `flex items-center justify-center lg:w-28 w-18 h-12 gap-2 cursor-pointer transition-colors relative ${
                             isActive 
                             ? "text-blue-500 border-b-blue-500 border-b-4" 
                             : "text-gray-600 rounded-lg hover:bg-gray-100"

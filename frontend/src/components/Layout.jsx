@@ -1,4 +1,4 @@
-import React, { use, useCallback, useEffect } from "react";
+import React, { use, useCallback, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +14,10 @@ const Layout = ({ user, onLogout }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = React.useState(false);
     const [posts, setPosts] = React.useState([])
+    const [dbpage, setDbPage] = React.useState(1)
+    const [trendingPage, setTrendingPage] = useState(1);
+    const [followersPage, setFollowersPage] = useState(1);
+
 
 
     const timeAgo = (dateString) => {
@@ -54,7 +58,6 @@ const Layout = ({ user, onLogout }) => {
 
     const fetchPosts = useCallback(async () => {
       try {
-        setLoading(true)
         const {data} = await axios.get(`${url}/api/posts/`);
         setPosts(data.posts || []);
       }
@@ -65,9 +68,6 @@ const Layout = ({ user, onLogout }) => {
           onLogout();
         }
       }
-      finally {
-        setLoading(false)
-      }
     },[onLogout])
     useEffect(() => {
         fetchCategories();
@@ -75,41 +75,41 @@ const Layout = ({ user, onLogout }) => {
     }, [fetchCategories, fetchPosts]);
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar user={user} onLogout={onLogout} />
-      <div className="flex flex-1 justify-between w-full bg-gray-50 font-sans">
-        <div className="justify-center w-full items-center px-3 flex-col">
-          <Outlet/>
+      <Navbar user={user} onHomeClick={() => {setDbPage(1); setFollowersPage(1); setTrendingPage(1)}} onLogout={onLogout} />
+      <div className="flex flex-1 gap-10 w-full justify-center bg-gray-50 font-sans">
+        <div className="justify-center mt-8 mb-8 ml-10 lg:ml-30 lg:mr-0 mr-10 w-full items-center flex-col">
+          <Outlet context={{posts, setPosts: fetchPosts, timeAgo, user, dbpage, setDbPage, trendingPage, setTrendingPage, followersPage, setFollowersPage}}/>
         </div>
-        <div className="hidden md:flex flex-col gap-5 mt-5 mr-8 sticky w-110 h-full">
+        <div className="hidden sticky top-23 lg:flex mr-30 mt-8 flex-col gap-5 w-200 h-full">
           <div className="border-2 rounded-2xl flex flex-col gap-3 items-center px-3 py-2.5 bg-white border-gray-100 shadow shadow-gray-200">
             <div className="text-xl font-bold flex gap-3 text-center  text-gray-700">
               <IoMdTrendingUp  className="w-6 mt-1 h-6 text-orange-500"/>Trending categories
             </div>
             {loading && <div className="animate-spin h-7 w-7 border-4 border-blue-500 border-t-transparent ml-6 rounded-full"></div>}
-            <div className="w-full flex flex-col gap-4 mt-2 ">
+            {!loading && <div className="w-full flex flex-col gap-4 mt-2 ">
               {categories.map((category) => (
-              <div key={category.categoryId} onClick={() => navigate(`/category/${category.slug}`)} className="cursor-pointer font-semibold text-xl text-gray-600 justify-between flex items-center pl-2 pr-2 ">
+              <div key={category.categoryId} onClick={() => navigate(`/category/${category.slug}`)} className="cursor-pointer font-semibold text-lg text-gray-600 justify-between flex items-center pl-2 pr-2 ">
                 <span className="flex gap-2 items-center">
                   <FiHash className="w-5 h-5 text-center text-gray-400"/> {category.name}
                 </span>
                 <span className="bg-gray-200 text-gray-700 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded-full">{category.totalPosts}</span>
               </div>
             ))}
-            </div>
+            </div>}
           </div>
           <div className="border-2 rounded-2xl flex flex-col gap-3 items-center px-3 py-2.5 bg-white border-gray-100 shadow shadow-gray-200">
-              <div className="text-xl font-bold flex gap-3 text-center text-gray-700">
+              <div className="text-lg font-bold flex gap-3 text-center text-gray-700">
                 <Clock  className="w-6 mt-0.5 h-6 text-blue-500"/>Recently posted 
               </div>
                 {loading && <div className="animate-spin h-7 w-7 border-4 border-blue-500 border-t-transparent ml-6 rounded-full"></div>}
-                <div className="w-full flex flex-col gap-2 mt-2">
-                  {posts.slice(0, 4).map((post) => (
+                {!loading && <div className="w-full flex flex-col gap-2 mt-2">
+                  {posts.slice(0, 5).map((post) => (
                     <div key={post._id} onClick={() => navigate(`/posts/${post._id}`)} className="cursor-pointer font-semibold text-xl text-gray-600 justify-start flex flex-col px-2">
                       <span className="text-lg text-gray-700">{post.title}</span>
                       <span className="text-sm text-gray-400">{post.author.username} • {timeAgo(post.createAt)} </span>
                     </div>
                   ))}
-                </div>
+                </div>}
           </div>
         </div>
       </div>
