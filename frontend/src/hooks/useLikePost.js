@@ -7,8 +7,6 @@ export const useLikePost = (setPosts) => {
     return useMutation({
         mutationFn:({postId, token}) => toggleLike(postId, token),
         onSuccess: (data, variables) => {
-            console.log("API response:", data);
-            console.log(variables)
             setPosts((prev) => prev.map((p) => p._id === variables.postId ? {...p, likes: data.likes, likeCount: data.likeCount} : p))
         }
     })

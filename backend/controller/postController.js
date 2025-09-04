@@ -46,7 +46,7 @@ export async function getAllPosts(req, res) {
 export async function getPostsByUser(req, res) {
     try {
         const userId = req.params.userId;
-        const posts = await Post.find({author: userId}).populate('author', 'username email avatar').sort({createAt: -1});
+        const posts = await Post.find({author: userId}).populate('author', 'username email avatar').populate('tags', 'name slug').populate('category', 'name slug').sort({createAt: -1});
         if(!posts) {
             return res.status(404).json({success: false, message: 'No posts found for this user'});
         }
@@ -64,8 +64,19 @@ export async function getPostById(req, res) {
         if(!post) {
             return res.status(404).json({success: false, message: 'Post not found'});
         }
-        post.viewCount = (post.viewCount || 0) + 1;
-        await post.save();
+        const viewerIp = req.ip;
+        const now = new Date();
+        const lastView = post.recentViews.find(v => v.ip === viewerIp)
+        if(!lastView || (now - lastView.lastView) > 1000 * 60 * 60) {
+            post.view = (post.view || 0) + 1
+            if(lastView) {
+                lastView.lastView = now
+            } 
+            else {
+                post.recentViews.push({ip: viewerIp, lastView: now})
+            }
+            await post.save();
+        }
         res.status(200).json({success: true, post});
     }
     catch(error) {

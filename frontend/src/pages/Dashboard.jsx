@@ -5,11 +5,13 @@ import { AiOutlineLike } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import { CiBookmark } from "react-icons/ci";
 import { useLikePost } from "../hooks/useLikePost";
+import PostModal from "../components/PostModal";
 
 
 const Dashboard = () => {
     const {posts, setPosts, timeAgo, user} = useOutletContext();
     const {dbpage, setDbPage} = useOutletContext();
+    const [open, setOpen] = useState(false)
     
     const postPerPage = 5; 
     const lastIndex = postPerPage * dbpage;
@@ -42,19 +44,24 @@ const Dashboard = () => {
             }
         }
         return pages
-
-            
     }
+
         
     const navigate = useNavigate();
-    console.log("User token:", user?.token);
     const {mutate: likePost} = useLikePost(setPosts)
     
     if(posts.length === 0) {
         return <div className="text-gray-500 font-medium text-lg">No posts available</div>
     }
     return (
+        <>
         <div className="w-full flex flex-col gap-5">
+            {user && <div className={`bg-white border rounded-3xl border-gray-100 lg:h-40 items-center mb-6 px-5 py-5 pl-10 pr-10  shadow shadow-gray-200 gap-5 ${dbpage === 1  ?  "flex" : "hidden"}`}>
+                <img onClick={() => navigate(`/profile/${user._id}`)} src={user.avatar} alt="avatar" className="w-12 h-12 rounded-full object-cover" /> 
+                <button onClick={() => setOpen(true)} className="flex hover:cursor-pointer w-full rounded-2xl px-4 h-20 items-center font-sans font-semibold text-gray-600 bg-gray-100 border border-transparent">
+                    Hey, {user.name}. Let's create some posts!    
+                </button>
+            </div>}
             {currentPosts.map((post) => (
                 <div key={post._id} className="bg-white border rounded-3xl border-gray-100 shadow flex flex-col shadow-gray-200 justify-start p-3">
                     <div className="gap-2 flex items-center  hover:cursor-pointer" onClick={() => navigate(`/profile/${post.author._id}`)}>
@@ -131,6 +138,8 @@ const Dashboard = () => {
         </button>
       </div>
         </div>
+        <PostModal isOpen={open} onClose ={() => setOpen(false)} onSave={setPosts} user={user} />
+    </>
     )
 }
 export default Dashboard;

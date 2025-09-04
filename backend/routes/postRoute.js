@@ -52,7 +52,7 @@ const postRouter = express.Router();
  *       201:
  *         description: Bài viết được tạo
  */
-postRouter.route('/').get(getAllPosts).post(authMiddleware, createPost);
+    postRouter.route('/').get(getAllPosts).post(authMiddleware, createPost);
 
 /**
  * @swagger

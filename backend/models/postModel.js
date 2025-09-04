@@ -10,6 +10,7 @@ const postSchema = new mongoose.Schema({
     likes : [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
     likeCount : { type: Number, default: 0 },
     view : { type: Number, default: 0 },
+    recentViews: [{ip: String, lastView : Date}],
     createAt: { type: Date, default: Date.now},
     updateAt: { type: Date, default: Date.now},
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "comment" }]

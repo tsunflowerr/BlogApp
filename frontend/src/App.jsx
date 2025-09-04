@@ -9,9 +9,12 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Trending from "./pages/Trending.jsx";
 import { Navigate } from "react-router-dom";
 import Following from "./pages/Following.jsx";
-import Layout from "./components/Layout.jsx";
+import Layout from "./components/layout/MainLayout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { ToastContainer } from "react-toastify";
+import Profile from "./components/Profile.jsx";
+import SimpleLayout from "./components/layout/SimpleLayout.jsx"
+import PostDetail from "./pages/PostDetail.jsx";
 
 const App = () => {
   const navigate = useNavigate();
@@ -79,6 +82,10 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+        </Route>
+        <Route element={<SimpleLayout user={currentUser} onLogout={handleLogout} />}>
+            <Route path="/profile/:userId" element={<Profile currentUser={currentUser} onLogout={handleLogout}/>}/>
+            <Route path="/posts/:postId" element={<PostDetail/>} />
         </Route>
       </Routes>
     </>
