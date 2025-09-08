@@ -57,7 +57,7 @@ const Dashboard = () => {
         <>
         <div className="w-full flex flex-col gap-5">
             {user && <div className={`bg-white border rounded-3xl border-gray-100 lg:h-40 items-center mb-6 px-5 py-5 pl-10 pr-10  shadow shadow-gray-200 gap-5 ${dbpage === 1  ?  "flex" : "hidden"}`}>
-                <img onClick={() => navigate(`/profile/${user._id}`)} src={user.avatar} alt="avatar" className="w-12 h-12 rounded-full object-cover" /> 
+                <img onClick={() => navigate(`/profile/${user._id}`)} src={user.avatar} alt="avatar" className="w-12 hover:cursor-pointer h-12 rounded-full object-cover" /> 
                 <button onClick={() => setOpen(true)} className="flex hover:cursor-pointer w-full rounded-2xl px-4 h-20 items-center font-sans font-semibold text-gray-600 bg-gray-100 border border-transparent">
                     Hey, {user.name}. Let's create some posts!    
                 </button>
@@ -79,7 +79,7 @@ const Dashboard = () => {
                     <div className="border-b-2 flex flex-col border-gray-200">
                         <div onClick={() => navigate(`/posts/${post._id}`)} className="gap-3 justify-start hover:cursor-pointer flex flex-col  pb-2">
                             <span className="text-xl font-semibold text-gray-70">{post.title}</span>
-                            <img src={post.thumbnail} alt="post" className="w-full 2xl:h-128 h-84 object-cover rounded-xl"/>
+                            <img src={post.thumbnail || "https://ui-avatars.com/api/?name=user2&background=random" } alt="post" className="w-full 2xl:h-128 h-84 object-cover rounded-xl"/>
                             <p className="text-gray-700 leading-relaxed">{post.content.length > 200 ? post.content.slice(0, 200) + "..." : post.content}</p>
                         </div>
                         <div className="mb-3  flex items-start gap-2">

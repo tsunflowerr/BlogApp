@@ -2,6 +2,9 @@ import User from '../models/userModel.js';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import e from 'express';
+import Post from '../models/postModel.js'
+import Comment from "../models/commentModel.js"
 
 const JWT_SECRET = process.env.JWT_SECRET   || 'your_jwt_secret_key';
 const JWT_EXPIRES_IN = '24h'; // Token expiration time
@@ -81,7 +84,7 @@ export async function loginUser(req, res) {
 
 export async function getCurrentUser(req, res) {
     try {
-        const user = await User.findById(req.user.id).select('username email');
+        const user = await User.findById(req.user.id).select('username email avatar');
         if(!user) {
             return res.status(404).json({success:false, message:'User not found'})
         }
@@ -95,11 +98,11 @@ export async function getCurrentUser(req, res) {
 
 export async function updateUser(req, res) {
 
-    const {username, email} = req.body;
+    const {username, email, avatar} = req.body;
     if(!username && !email) {
         return res.status(400).json({success: false, message: 'Please fill all fields'});
     }
-    if(!validator.isEmail(email)) {
+    if(email && !validator.isEmail(email)) {
         return res.status(400).json({success: false, message: "Invalid email format"});
     }
     try {
@@ -107,7 +110,7 @@ export async function updateUser(req, res) {
         if(exist) {
             return res.status(400).json({success: false, message: "Email already in use"});
         }
-        const user = await User.findByIdAndUpdate(req.user.id, {username, email}, {new: true}).select('username email');
+        const user = await User.findByIdAndUpdate(req.user.id, {username, email, avatar}, {new: true}).select('username email avatar');
         res.status(200).json({success: true, user});
     }
     catch(error) {
@@ -117,21 +120,39 @@ export async function updateUser(req, res) {
     
 }
 
+import mongoose from "mongoose";
+
 export async function deleteUser(req, res) {
     try {
         const userIdtoDelete = req.params.id || req.user.id;
-        if(req.params.id && req.params.id !== req.user.id && !req.user.isAdmin) {
-            return res.status(403).json({success: false, message: 'Access denied. Admins only.'});
+
+        if (req.params.id && req.params.id !== req.user.id && !req.user.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Access denied. Admins only.' });
         }
-        const deleteUser = await User.findByIdAndDelete(userIdtoDelete);
-        if(!deleteUser) {
-            return res.status(404).json({success:false, message:'User not found'})
+
+        const userObjectId = new mongoose.Types.ObjectId(userIdtoDelete);
+
+        const deleteUser = await User.findByIdAndDelete(userObjectId);
+
+        if (!deleteUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
         }
-        res.status(200).json({success:true, message:'User deleted successfully'});
+
+        // Xóa tất cả bài viết của user
+        await Post.deleteMany({ author: userObjectId });
+        // Xóa tất cả comment của user
+        await Comment.deleteMany({ author: userObjectId });
+        // Xóa user khỏi danh sách likes của tất cả bài viết
+        await Post.updateMany(
+            { likes: userObjectId },
+            { $pull: { likes: userObjectId } }
+        );
+
+        res.status(200).json({ success: true, message: 'User deleted successfully' });
     }
-    catch(error) {
+    catch (error) {
         console.log('Error deleting user:', error);
-        res.status(500).json({success: false, message: 'Server error'});
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 }
 

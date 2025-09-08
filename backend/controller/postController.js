@@ -4,26 +4,42 @@ import Tag from '../models/tagModel.js';
 
 export async function createPost(req, res) {
     try {
-        const {title, content, tags, category, thumbnail} = req.body;
-        if(!title || !content ) {
-            return res.status(400).json({success: false, message: 'Title and content are required'});
+        const { title, content, tags, category, thumbnail } = req.body;
+
+        if (!title || !content) {
+            return res.status(400).json({
+                success: false,
+                message: 'Title and content are required'
+            });
         }
+
         const post = new Post({
             title,
             content,
             author: req.user._id,
             tags: tags || [],
-            category : category || null,
-            thumbnail: thumbnail || '',
-        })
-        const saved = await post.save();
-        res.status(201).json({success:true, post:saved})
-    }
-    catch(error) {
+            category: category || [],
+            thumbnail: thumbnail || ''
+        });
+
+        let saved = await post.save();
+        saved = await saved.populate('author', 'username email avatar');
+        saved = await saved.populate('tags', 'name slug');
+        saved = await saved.populate('category', 'name slug');
+
+        res.status(201).json({
+            success: true,
+            post: saved
+        });
+    } catch (error) {
         console.error('Error creating post:', error);
-        res.status(500).json({success: false, message: 'Server error'});    
+        res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
     }
 }
+
 
 export async function getAllPosts(req, res) {
     try {
@@ -91,7 +107,7 @@ export async function updatePost(req, res) {
         const updatedPost = await Post.findOneAndUpdate({
             _id: req.params.postId,
             author: req.user._id
-        }, data, {new: true, runValidators: true}).populate('category', 'name slug').populate('tags', 'name slug');
+        }, data, {new: true, runValidators: true}).populate('category', 'name slug').populate('tags', 'name slug').populate('author', 'username avatar');
         if(!updatedPost)
             return res.status(404).json({success: false, message: 'Post not found or unauthorized'});
         res.status(200).json({success: true, post: updatedPost});

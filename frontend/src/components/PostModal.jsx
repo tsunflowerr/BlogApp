@@ -246,10 +246,14 @@ const PostModal = ({ isOpen, onClose, postToEdit, onSave, user }) => {
             }
             
             // Call onSave callback with the saved post
+            const savedPost = responseData.posts || responseData.post || responseData
             if (onSave) {
-                await onSave()
+                try {
+                await Promise.resolve(onSave(savedPost));
+                } catch (err) {
+                console.warn("onSave callback error:", err);
+                }
             }
-            
             // Reset form and close modal
             setPostData(DEFAULT_POST)
             setSelectedCategories([])
@@ -289,7 +293,7 @@ const PostModal = ({ isOpen, onClose, postToEdit, onSave, user }) => {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4" >
+                <form onSubmit={(e)=>{e.preventDefault();handleSubmit()}} className="space-y-4" >
                     {error && (
                         <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-100">
                             {error}
