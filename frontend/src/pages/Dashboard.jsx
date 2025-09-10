@@ -93,7 +93,7 @@ const Dashboard = () => {
                             <span onClick={() => likePost({ postId: post._id, token: user.token })} className={`text-md hover:cursor-pointer hover:bg-gray-200 hover:scale-105 hover:rounded-md w-22 ${post.likes.includes(user?._id) ? "text-blue-600 font-semibold" : "text-gray-500"}`}>
                                 <AiOutlineLike className="inline w-5 h-5 items-center mb-1 text-lg"/> {post.likeCount} Likes
                             </span>
-                            <span onClick={() => navigate(`/post/${post._id}`)} className="ml-2 text-md items-center text-gray-500 hover:cursor-pointer hover:bg-gray-200 hover:scale-105 hover:rounded-md w-32">
+                            <span onClick={() => navigate(`/posts/${post._id}#comments`)} className="ml-2 text-md items-center text-gray-500 hover:cursor-pointer hover:bg-gray-200 hover:scale-105 hover:rounded-md w-32">
                                 <FaRegComment className="w-4 mb-1 mr-1.5  inline h-4"/>{post.comments.length} Comments
                             </span>
                         </div>

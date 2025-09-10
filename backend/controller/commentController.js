@@ -1,4 +1,5 @@
 import Comment from '../models/commentModel.js';
+import Post from "../models/postModel.js"
 
 export async function addComment(req, res) {
     try {
@@ -13,7 +14,12 @@ export async function addComment(req, res) {
             author: req.user._id,
         })
         const saved = await comment.save();
-        await saved.populate('author', 'userName email');
+        await saved.populate('author', 'userName email avatar');
+        await Post.findByIdAndUpdate(
+            postId,
+            {$push: {comments: saved._id}},
+            {new: true}
+        )
         res.status(201).json({success:true, comment:saved})
     }
     catch(error) {
@@ -25,7 +31,7 @@ export async function addComment(req, res) {
 export async function getCommentsByPost(req, res) {
     try {
         const postId = req.params.postId;
-        const comments = await Comment.find({postId}).populate('author', 'userName email').sort({createAt: -1});
+        const comments = await Comment.find({postId}).populate('author', 'userName email avatar').sort({createAt: -1});
         if(!comments) {
             return res.status(404).json({success: false, message: 'No comments found for this post'});
         }
@@ -46,7 +52,7 @@ export async function updateComment(req, res) {
         }
         const comment = await Comment.findOneAndUpdate(
             {_id: commentId, author: req.user._id},{content}, {new: true, runValidators: true}
-        ).populate('author', 'userName email');
+        ).populate('author', 'userName email avatar');
         res.status(200).json({success:true, comment});
     }
     catch(error) {

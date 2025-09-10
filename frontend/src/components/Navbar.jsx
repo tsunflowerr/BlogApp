@@ -166,10 +166,10 @@ const Navbar = ({user=null, onLogout, onHomeClick}) => {
                     ) : (
                         <>
                                 <button onClick={() => navigate('/login')} className="px-4 py-2 text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
-                                    Đăng nhập
+                                    Login
                                 </button>
-                                <button onClick={() => navigate('/signup')} className="px-4 py-2 text-sm cursor-pointer font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
-                                    Đăng ký
+                                <button onClick={() => navigate('/signup')} className="px-4 py-2 ml-2 text-sm cursor-pointer font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                                    Sign Up
                                 </button>
                        </>
                     )}

@@ -76,7 +76,7 @@ export async function getPostsByUser(req, res) {
 
 export async function getPostById(req, res) {
     try {
-        const post = await Post.findOne({ _id: req.params.postId }).populate('author', 'username email avatar').populate('category', 'name slug').populate('tags', 'name slug');
+        const post = await Post.findOne({ _id: req.params.postId }).populate('author', 'username email avatar').populate('category', 'name slug').populate('tags', 'name slug').populate({path:"comments", populate:{path:"author", select:"username email avatar"}, options:{sort:{createAt:-1}}});
         if(!post) {
             return res.status(404).json({success: false, message: 'Post not found'});
         }

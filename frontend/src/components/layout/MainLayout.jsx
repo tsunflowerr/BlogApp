@@ -73,7 +73,6 @@
           fetchCategories();
           fetchPosts();
       }, [fetchCategories, fetchPosts]);
-      console.log(posts)
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar user={user} onHomeClick={() => {setDbPage(1); setFollowersPage(1); setTrendingPage(1)}} onLogout={onLogout} />

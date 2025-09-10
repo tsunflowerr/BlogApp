@@ -102,26 +102,29 @@ const Profile = ({currentUser, setCurrentUser, onLogout}) => {
     return (
         <>
         {loading && 
-        <div className="animate-spin h-7 w-7 border-4 border-blue-500 border-t-transparent items-center ml-6 rounded-full"></div>}
-        {!loading && <div className="gap-3 flex flex-col items-center lg:mr-30 mr-0">
-            <div className="bg-white flex items-center justify-center gap-10 w-full max-w-3xl border border-transparent rounded-3xl">
+        <div className="items-center flex justify-center  h-full">
+            <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"/>
+        </div>}
+        
+        {!loading && <div className="gap-3 flex flex-col items-center">
+            <div className="bg-white flex items-center mt-10 justify-center gap-10 w-full max-w-3xl border border-transparent rounded-3xl">
                 <div className="flex gap-5 justify-center items-center">
                     <img src={user[0]?.avatar || currentUser.avatar} alt="avatar" className="w-30 h-30 rounded-full"></img>
                     <div className="font-extrabold text-3xl text-gray-800 font-sans">{user[0]?.username || currentUser.name}</div>
                 </div>
                 {currentUser._id === userId && <div className="gap-3 flex">
-                    <button className="bg-blue-500 gap-2 border  lg:flex hidden hover:cursor-pointer w-42 h-10 justify-center items-center border-blue-500 rounded-2xl" onClick={() => {setOpen(true), setIsUpdate(false)}}>
+                    <button className="bg-blue-500 gap-2 border flex hover:cursor-pointer md:w-42 w-18 h-10 justify-center items-center border-blue-500 rounded-2xl" onClick={() => {setOpen(true), setIsUpdate(false)}}>
                         <Plus className="w-5 h-5 text-white text-center"></Plus>
-                        <span className="font-sans text-white font-semibold">Create a post</span>
+                        <span className="font-sans text-white lg:block hidden font-semibold">Create a post</span>
                     </button>
                     <div className="relative ">
-                    <button className="bg-gray-200 gap-2 border lg:flex hidden border-transparent hover:cursor-pointer w-42 h-10 justify-center items-center rounded-2xl" onClick={() => setOpenMenuEdit(!openMenuEdit)}>
+                    <button className="bg-gray-200 gap-2 border flex border-transparent hover:cursor-pointer md:w-42 w-18 h-10 justify-center items-center rounded-2xl" onClick={() => setOpenMenuEdit(!openMenuEdit)}>
                         <Pen className="w-5 h-5 text-gray-800 text-center"></Pen>
-                        <span className="font-sans tetx-gray-800 font-semibold">Edit profile</span>
+                        <span className="font-sans tetx-gray-800 lg:block hidden font-semibold">Edit profile</span>
                         <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${openMenuEdit ? 'rotate-180' : ''}`} />
                     </button>
                     {openMenuEdit && (
-                            <ul className="absolute top-11 w-48 bg-white rounded-2xl shadow-x1 border border-purple-100 z-50 overflow-hidden animate-fadeIn">
+                            <ul className="absolute top-11 md:w-48 w-30  bg-white rounded-2xl shadow-x1 border border-purple-100 z-50 overflow-hidden animate-fadeIn">
                                 <li className = 'p-2'>
                                     <button onClick={() => {setEditProfile(true), setOpenMenuEdit(false)}}
                                     className="w-full px-4 py-2.5 text-left hover:bg-gray-100 text-sm text-gray-700 transition-colors flex items-center gap-2 group" >
@@ -151,9 +154,9 @@ const Profile = ({currentUser, setCurrentUser, onLogout}) => {
             {posts.length == 0 && (
                 <div className="items-center justify-center font-bold text-gray-700 text-2xl">Let's create some posts</div>
             )}
-            
+            <div className="w-full p-6 flex flex-col gap-8 items-center justify-center">
             {posts.map((post) => (
-                            <div key={post._id} className="bg-white max-w-4xl w-full mt-6 border rounded-3xl border-gray-100 shadow flex flex-col shadow-gray-200 justify-start p-3">
+                            <div key={post._id} className="bg-white max-w-5xl w-full border rounded-3xl border-gray-100 shadow flex flex-col shadow-gray-200 justify-start p-3">
                                 <div className="flex gap-10 justify-between border-b-2 border-gray-200">
                                     <div className="flex flex-col">
                                     <div className="gap-2 flex items-center hover:cursor-pointer" onClick={() => navigate(`/profile/${post.author._id}`)}>
@@ -211,6 +214,7 @@ const Profile = ({currentUser, setCurrentUser, onLogout}) => {
                                 
                             </div>
                         ))}
+                    </div>
         </div>}
         
         <PostModal isOpen={open} onClose ={() => setOpen(false)} onSave={handleSaveFromModal} user={currentUser} postToEdit={isUpdate ? postUpdate : ""} />

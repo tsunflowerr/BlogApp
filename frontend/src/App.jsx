@@ -86,7 +86,7 @@ const App = () => {
         </Route>
         <Route element={<SimpleLayout user={currentUser} onLogout={handleLogout} />}>
             <Route path="/profile/:userId" element={<Profile currentUser={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout}/>}/>
-            <Route path="/posts/:postId" element={<PostDetail/>} />
+            <Route path="/posts/:postId" element={<PostDetail user={currentUser}/>} />
         </Route>
       </Routes>
     </>
