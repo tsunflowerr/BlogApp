@@ -17,6 +17,8 @@
       const [dbpage, setDbPage] = React.useState(1)
       const [trendingPage, setTrendingPage] = useState(1);
       const [followersPage, setFollowersPage] = useState(1);
+      const [postsByCategoryPage, setPostsByCategoryPage] = useState(1);
+      const [postsByTagPage, setPostsByTagPage] = useState(1);
 
 
 
@@ -75,10 +77,10 @@
       }, [fetchCategories, fetchPosts]);
     return (
       <div className="min-h-screen flex flex-col">
-        <Navbar user={user} onHomeClick={() => {setDbPage(1); setFollowersPage(1); setTrendingPage(1)}} onLogout={onLogout} />
+        <Navbar user={user} onHomeClick={() => {setDbPage(1); setFollowersPage(1); setTrendingPage(1), setPostsByCategoryPage(1), setPostsByTagPage(1)}} onLogout={onLogout} />
         <div className="flex flex-1 gap-10 w-full justify-center bg-gray-50 font-sans">
           <div className="justify-center mt-8 mb-8 ml-10 lg:ml-30 lg:mr-0 mr-10 w-full items-center flex-col">
-            <Outlet context={{posts, setPosts: fetchPosts, timeAgo, user, dbpage, setDbPage, trendingPage, setTrendingPage, followersPage, setFollowersPage}}/>
+            <Outlet context={{posts, setPosts: fetchPosts, timeAgo, user, dbpage, setDbPage, trendingPage, setTrendingPage, followersPage, setFollowersPage, postsByCategoryPage, setPostsByCategoryPage, postsByTagPage, setPostsByTagPage}}/>
           </div>
           <div className="hidden sticky top-23 lg:flex mr-30 mt-8 flex-col gap-5 w-200 h-full">
             <div className="border-2 rounded-2xl flex flex-col gap-3 items-center px-3 py-2.5 bg-white border-gray-100 shadow shadow-gray-200">

@@ -15,6 +15,8 @@ import { ToastContainer } from "react-toastify";
 import Profile from "./components/Profile.jsx";
 import SimpleLayout from "./components/layout/SimpleLayout.jsx"
 import PostDetail from "./pages/PostDetail.jsx";
+import PostByCategory from "./pages/PostByCategory.jsx";
+import PostByTag from "./pages/PostByTag.jsx";
 
 const App = () => {
   const navigate = useNavigate();
@@ -75,6 +77,8 @@ const App = () => {
         <Route element={<Layout user={currentUser} onLogout={handleLogout} />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/trending" element={<Trending />} />
+          <Route path="/category/:slug" element={<PostByCategory/>}/>
+          <Route path="/tag/:slug" element={<PostByTag/>}/>
           <Route
             path="/follower"
             element={

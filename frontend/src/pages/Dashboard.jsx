@@ -84,7 +84,7 @@ const Dashboard = () => {
                         </div>
                         <div className="mb-3  flex items-start gap-2">
                             {post.tags.map((tag) => (
-                                <span onClick={() => navigate(`/tag/${tag._id}`)} key={tag._id} className="text-sm font-semibold bg-gray-100 hover:cursor-pointer text-gray-700 hover:bg-gray-200 px-2 py-0.5 rounded-full">#{tag.name}</span>
+                                <span onClick={() => navigate(`/tag/${tag.slug}`)} key={tag._id} className="text-sm font-semibold bg-gray-100 hover:cursor-pointer text-gray-700 hover:bg-gray-200 px-2 py-0.5 rounded-full">#{tag.name}</span>
                             ))}
                         </div>
                     </div>

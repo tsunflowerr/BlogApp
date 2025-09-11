@@ -1,58 +1,62 @@
-import React, { useMemo, useState } from "react";
-import { useOutletContext } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useLikePost } from "../hooks/useLikePost";
 import { AiOutlineLike } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import { CiBookmark } from "react-icons/ci";
-import { useLikePost } from "../hooks/useLikePost";
 
-
-const Trending = () => {
-    const {posts, setPosts, timeAgo, user} = useOutletContext();
-    const {trendingPage, setTrendingPage} = useOutletContext();
-
-
-    const trendingPost = useMemo(() => {
-        const w_views = 1;
-        const w_likes = 6;
-        const w_comments = 8;
-        const alpha = 1.5
-        return [...posts].map((post) => {
-            const createdAt = post.createAt ? new Date(post.createAt) : null 
-            const hoursSincePost = createdAt && !isNaN(createdAt) ? (Date.now() -createdAt.getTime()) / 1000 / 3600 : 0
-            const trendingScore = ((w_views * post.view) +
-                 (w_likes * post.likes.length) +
-                 (w_comments * post.comments.length)) /
-                Math.pow(hoursSincePost + 2, alpha);
-            return { ...post, trendingScore };
-        }).sort((a, b) => b.trendingScore - a.trendingScore)
-    }, [posts])
-    console.log(trendingPost.map(p => ({ id: p._id, score: p.trendingScore })))
-
+const URL_API = "http://localhost:4000/api";
+const PostByCategory = () => {
+    const {slug} = useParams()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(false)
+    const [posts, setPosts] = useState([])
+    const {timeAgo, user, postsByCategoryPage, setPostsByCategoryPage} = useOutletContext();
+    useEffect (() =>{
+        const fetchPostByCategory = async() => {
+            try {
+                setLoading(true)
+                const {data} = await axios.get(`${URL_API}/posts/category/${slug}`)
+                if(data.success) {
+                    setPosts(data.posts)
+                }
+            }
+            catch(err) {
+                console.log("Failed to load posts", err.response?.message)
+                toast.error("Failed to load posts")
+            }
+            finally{
+                setLoading(false)
+            }
+        }
+        fetchPostByCategory();
+    },[slug])
+    const category = posts[0]?.category.find(cat => cat.slug === slug)
 
     const postPerPage = 5; 
-    const lastIndex = postPerPage * trendingPage;
+    const lastIndex = postPerPage * postsByCategoryPage;
     const firstIndex = lastIndex - postPerPage;
-    const currentPosts = trendingPost.slice(firstIndex, lastIndex)
-
+    const currentPosts = posts.slice(firstIndex, lastIndex)
     const totalPages = Math.ceil(posts.length / postPerPage)
     const getPageNumbers = () => {
         let pages = [];
         for(let i = 1; i <= Math.min(3, totalPages); i++) {
             pages.push(i)
         }
-        if(trendingPage > 5) {
+        if(postsByCategoryPage > 5) {
             pages.push("...")
         }
-        let start = Math.max(4, trendingPage-1)
-        let end = Math.min(totalPages-3, trendingPage+1);
+        let start = Math.max(4, postsByCategoryPage-1)
+        let end = Math.min(totalPages-3, postsByCategoryPage+1);
 
         for(let i = start; i <= end; i++) {
             if(i > 3 && i < totalPages - 2) {
                 pages.push(i)
             }
         }
-        if(trendingPage < totalPages - 4) {
+        if(postsByCategoryPage < totalPages - 4) {
             pages.push("...")
         }
         for(let i = Math.max(totalPages-2, 4); i <= totalPages; i++) {
@@ -63,17 +67,24 @@ const Trending = () => {
         return pages
             
     }
-
-
-        
-    const navigate = useNavigate();
     const {mutate: likePost} = useLikePost(setPosts)
-    
-    if(posts.length === 0) {
+    if(posts.length === 0 && !loading) {
         return <div className="text-gray-500 font-medium text-lg">No posts available</div>
     }
     return (
-        <div className="w-full flex flex-col gap-5">
+        <>
+        {loading && 
+        <div className="items-center flex justify-center  h-full">
+            <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"/>
+        </div>}
+        <div className="gap-2 flex flex-col p-2 mb-5">
+            <div className="flex gap-2 text-2xl text-gray-600 font-bold">
+                <span className="cursor-pointer hover:text-blue-500" onClick={() => navigate('/')}>Home</span> {'>>'}
+                <span>{category?.name}</span>
+            </div>
+            <p className="text-lg font-semibold font-sans text-gray-700">{category?.description}</p>
+        </div>
+        {!loading && <div className="w-full flex flex-col gap-5">
             {currentPosts.map((post) => (
                 <div key={post._id} className="bg-white border rounded-3xl border-gray-100 shadow flex flex-col shadow-gray-200 justify-start p-3">
                     <div className="gap-2 flex items-center  hover:cursor-pointer" onClick={() => navigate(`/profile/${post.author._id}`)}>
@@ -105,7 +116,7 @@ const Trending = () => {
                             <span onClick={() => likePost({ postId: post._id, token: user.token })} className={`text-md hover:cursor-pointer hover:bg-gray-200 hover:scale-105 hover:rounded-md w-22 ${post.likes.includes(user?._id) ? "text-blue-600 font-semibold" : "text-gray-500"}`}>
                                 <AiOutlineLike className="inline w-5 h-5 items-center mb-1 text-lg"/> {post.likeCount} Likes
                             </span>
-                            <span onClick={() => navigate(`/post/${post._id}`)} className="ml-2 text-md items-center text-gray-500 hover:cursor-pointer hover:bg-gray-200 hover:scale-105 hover:rounded-md w-32">
+                            <span onClick={() => navigate(`/posts/${post._id}`)} className="ml-2 text-md items-center text-gray-500 hover:cursor-pointer hover:bg-gray-200 hover:scale-105 hover:rounded-md w-32">
                                 <FaRegComment className="w-4 mb-1 mr-1.5  inline h-4"/>{post.comments.length} Comments
                             </span>
                         </div>
@@ -118,8 +129,8 @@ const Trending = () => {
             ))}
             <div className="flex justify-center items-center gap-2 mt-5">
                 <button
-                onClick={() => setTrendingPage((p) => {Math.max(p - 1, 1), window.scroll({top: 0, behavior:"smooth"})})}
-                disabled={trendingPage === 1}
+                onClick={() => setPostsByCategoryPage((p) => {Math.max(p - 1, 1), window.scroll({top: 0, behavior:"smooth"})})}
+                disabled={postsByCategoryPage === 1}
                 className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"> Prev 
                 </button>
 
@@ -131,9 +142,9 @@ const Trending = () => {
                 ) : (
                 <button
                 key={page}
-                onClick={() => {setTrendingPage(page), window.scroll({top: 0, behavior:"smooth"})}}
+                onClick={() => {setPostsByCategoryPage(page), window.scroll({top: 0, behavior:"smooth"})}}
                 className={`px-3 py-1 rounded-md hover:cursor-pointer ${
-                trendingPage === page
+                postsByCategoryPage === page
                 ? "bg-blue-500 text-white"
                 : "bg-gray-200 hover:bg-gray-300"
             }`}>
@@ -142,14 +153,15 @@ const Trending = () => {
         )
       )}
         <button
-          onClick={() => setTrendingPage((p) => {Math.min(p + 1, totalPages), window.scroll({top: 0, behavior:"smooth"})})}
-          disabled={trendingPage === totalPages}
+          onClick={() => setPostsByCategoryPage((p) => {Math.min(p + 1, totalPages), window.scroll({top: 0, behavior:"smooth"})})}
+          disabled={postsByCategoryPage === totalPages}
           className="px-3 py-1 bg-gray-200 hover:cursor-pointer rounded-md disabled:opacity-50"
         >
           Next
         </button>
       </div>
-        </div>
+        </div>}
+        </>
     )
 }
-export default Trending;
+export default PostByCategory

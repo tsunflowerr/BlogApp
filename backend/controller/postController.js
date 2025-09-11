@@ -144,7 +144,7 @@ export async function getPostByCategorySlug(req, res) {
         if(!category) {
             return res.status(404).json({success: false, message: 'Category not found'});
         }
-        const posts = await Post.find({category: category._id}).populate('author', 'username email avatar').populate('category', 'name slug').populate('tags', 'name slug').sort({createdAt: -1});
+        const posts = await Post.find({category: category._id}).populate('author', 'username email avatar').populate('category', 'name slug description').populate('tags', 'name slug').sort({createdAt: -1});
         if(!posts || posts.length === 0) {
             return res.status(404).json({success: false, message: 'No posts found for this category'});
         }
