@@ -1,6 +1,7 @@
 import Post from '../models/postModel.js';
 import Category from '../models/categoryModel.js';
 import Tag from '../models/tagModel.js';
+import Notification from "../models/notificationModel.js"
 
 export async function createPost(req, res) {
     try {
@@ -85,6 +86,16 @@ export async function getPostById(req, res) {
         const lastView = post.recentViews.find(v => v.ip === viewerIp)
         if(!lastView || (now - lastView.lastView) > 1000 * 60 * 60) {
             post.view = (post.view || 0) + 1
+            if(post.view % 10 == 0) {
+                const notification = new Notification({
+                    postId: post._id,
+                    author: post.author?._id,
+                    user: post.author?._id,
+                    type:"milestone",
+                    content: `Congratulations — your post has ${post.view} views!`
+                })
+                await notification.save()
+            }
             if(lastView) {
                 lastView.lastView = now
             } 
@@ -182,7 +193,7 @@ export async function likePost(req, res) {
         if(!userId) {
             return res.status(401).json({success: false, message: 'Unauthorized'});
         }
-        const post = await Post.findById(postId);
+        const post = await Post.findById(postId).populate('author','avatar');
         if(!post) {
             return res.status(404).json({success: false, message: 'Post not found'});
         }
@@ -194,6 +205,16 @@ export async function likePost(req, res) {
         } else {
             post.likes.push(userId);
             post.likeCount = (post.likeCount || 0) + 1;
+            if(String(userId) !== String(post.author?._id)) {
+                const notification = new Notification({
+                postId: postId,
+                author: post.author?._id,
+                user: userId,
+                type: "like",
+                content: `liked your post`
+            })
+            await notification.save()
+            }
             await post.save();
             return res.status(200).json({success: true, message: 'Post liked', _id:postId, likes: post.likes, likeCount: post.likeCount});
         }

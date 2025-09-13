@@ -1,5 +1,6 @@
 import Comment from '../models/commentModel.js';
 import Post from "../models/postModel.js"
+import Notification from "../models/notificationModel.js"
 
 export async function addComment(req, res) {
     try {
@@ -8,6 +9,7 @@ export async function addComment(req, res) {
         if(!postId || !content) {
             return res.status(400).json({success: false, message: 'Post ID and content are required'});
         }
+        const post = await Post.findById(postId).populate('author', 'username')
         const comment = new Comment({
             postId,
             content,
@@ -15,6 +17,16 @@ export async function addComment(req, res) {
         })
         const saved = await comment.save();
         await saved.populate('author', 'userName email avatar');
+        if(String(post.author._id) !== String(req.user._id)) {
+            const notification = new Notification({
+                postId,
+                author: post.author._id,
+                user: req.user._id,
+                type:"comment",
+                content: `commented on your post`,
+            })
+            await notification.save()
+        }
         await Post.findByIdAndUpdate(
             postId,
             {$push: {comments: saved._id}},

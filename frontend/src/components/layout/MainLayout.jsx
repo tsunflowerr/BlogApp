@@ -77,7 +77,7 @@
       }, [fetchCategories, fetchPosts]);
     return (
       <div className="min-h-screen flex flex-col">
-        <Navbar user={user} onHomeClick={() => {setDbPage(1); setFollowersPage(1); setTrendingPage(1), setPostsByCategoryPage(1), setPostsByTagPage(1)}} onLogout={onLogout} />
+        <Navbar user={user} timeAgo={timeAgo} onHomeClick={() => {setDbPage(1); setFollowersPage(1); setTrendingPage(1), setPostsByCategoryPage(1), setPostsByTagPage(1)}} onLogout={onLogout} />
         <div className="flex flex-1 gap-10 w-full justify-center bg-gray-50 font-sans">
           <div className="justify-center mt-8 mb-8 ml-10 lg:ml-30 lg:mr-0 mr-10 w-full items-center flex-col">
             <Outlet context={{posts, setPosts: fetchPosts, timeAgo, user, dbpage, setDbPage, trendingPage, setTrendingPage, followersPage, setFollowersPage, postsByCategoryPage, setPostsByCategoryPage, postsByTagPage, setPostsByTagPage}}/>

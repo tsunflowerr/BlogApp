@@ -29,7 +29,6 @@ const Login = ({onSubmit, onSwitchMode}) => {
                         }
                     });
                     if(data?.success) {
-                        console.log(data)
                         onSubmit?.({token, userId, ...data.user});
                         toast.success("Session restored successfully")
                         navigate(from, {replace: true})

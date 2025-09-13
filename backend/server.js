@@ -6,6 +6,7 @@ import userRouter from "./routes/userRoute.js";
 import commentRouter from "./routes/commentRoute.js";
 import categoryRouter from "./routes/categoryRoute.js";
 import tagRouter from "./routes/tagRoute.js";
+import notificationRoute from "./routes/notificationRoute.js"
 import dotenv from "dotenv";
 import { swaggerUi, swaggerSpec } from './swagger.js';
 
@@ -25,6 +26,7 @@ app.use("/api/users", userRouter);
 app.use("/api", commentRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/tags", tagRouter);
+app.use("/api/notification", notificationRoute)
 
 app.get("/", (req, res) => {
     res.send("Welcome to the Blog API");
