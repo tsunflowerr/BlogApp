@@ -7,7 +7,7 @@ import Post from '../models/postModel.js'
 import Comment from "../models/commentModel.js"
 
 const JWT_SECRET = process.env.JWT_SECRET   || 'your_jwt_secret_key';
-const JWT_EXPIRES_IN = '24h'; // Token expiration time
+const JWT_EXPIRES_IN = "24h"; // Token expiration time
 
 const createToken = (userId) => {
     return jwt.sign({id: userId}, JWT_SECRET, {expiresIn: JWT_EXPIRES_IN});
@@ -84,7 +84,7 @@ export async function loginUser(req, res) {
 
 export async function getCurrentUser(req, res) {
     try {
-        const user = await User.findById(req.user.id).select('username email avatar');
+        const user = await User.findById(req.user.id).select('username email avatar followers followings').populate("followers", "username email avatar").populate("followings", "username email avatar");
         if(!user) {
             return res.status(404).json({success:false, message:'User not found'})
         }
@@ -194,3 +194,38 @@ export async function changePassword(req, res) {
         res.status(500).json({success: false, message: 'Server error'});
     }
 }
+
+export async function handleFollow(req, res) {
+  try {
+    const currentUserId = req.user._id?.toString() || req.user?.id?.toString();
+    const targetUserId = req.params.id;
+
+
+    const targetUser = await User.findById(targetUserId);
+    const currentUser = await User.findById(currentUserId);
+
+    if (!targetUser || !currentUser) {
+      return res.status(404).json({ success: false, message: "No user found" });
+    }
+
+    const isFollowing = targetUser.followers.some(f => f.toString() === currentUserId);
+    if (!isFollowing) {
+      targetUser.followers.push(currentUserId);
+      currentUser.followings.push(targetUserId);
+      await targetUser.save();
+      await currentUser.save();
+      return res.status(200).json({ success: true, type:"Follow", message: "Followed user successfully" });
+    } else {
+      targetUser.followers = targetUser.followers.filter(f => f.toString() !== currentUserId);
+      currentUser.followings = currentUser.followings.filter(f => f.toString() !== targetUserId);
+      await targetUser.save();
+      await currentUser.save();
+      return res.status(200).json({ success: true, type:"Unfollow", message: "Unfollowed user successfully" });
+    }
+  } catch (err) {
+    console.error("Error handle follow this user:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+}
+
+

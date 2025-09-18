@@ -5,8 +5,9 @@ const userSchema = new mongoose.Schema({
     email : { type: String, required: true, unique: true },
     password : { type: String, required: true},
     isAdmin : { type: Boolean, default: false },
-    avatar : { type: String, default: `https://ui-avatars.com/api/?name=${encodeURIComponent("User")}&background=random` }
-    
+    avatar : { type: String, default: `https://ui-avatars.com/api/?name=${encodeURIComponent("User")}&background=random` },
+    followers: [{type: mongoose.Schema.Types.ObjectId, ref: "user"}],
+    followings: [{type:mongoose.Schema.Types.ObjectId, ref: "user"}]
 })
 
 const userModel = mongoose.models.user || mongoose.model("user", userSchema);

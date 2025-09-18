@@ -45,7 +45,6 @@ const Dashboard = () => {
         }
         return pages
     }
-
         
     const navigate = useNavigate();
     const {mutate: likePost} = useLikePost(setPosts)
@@ -106,7 +105,7 @@ const Dashboard = () => {
             ))}
             <div className="flex justify-center items-center gap-2 mt-5">
                 <button
-                onClick={() => setDbPage((p) => {Math.max(p - 1, 1), window.scroll({top: 0, behavior:"smooth"})})}
+                onClick={() => setDbPage((p) => (window.scroll({ top: 0, behavior: "smooth" }), Math.max(p - 1, 1)))}
                 disabled={dbpage === 1}
                 className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"> Prev 
                 </button>
@@ -130,7 +129,7 @@ const Dashboard = () => {
         )
       )}
         <button
-          onClick={() => setDbPage((p) => {Math.min(p + 1, totalPages), window.scroll({top: 0, behavior:"smooth"})})}
+         onClick={() => setDbPage((p) => (window.scroll({ top: 0, behavior: "smooth" }), Math.min(p + 1, totalPages)))}
           disabled={dbpage === totalPages}
           className="px-3 py-1 bg-gray-200 hover:cursor-pointer rounded-md disabled:opacity-50"
         >

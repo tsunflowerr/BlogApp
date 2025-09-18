@@ -41,13 +41,14 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
     }
   };
 
+
   // Đánh dấu đã đọc
   const markAsRead = async (id) => {
     try {
       await axios.put(
         `${url_api}/notification/${id}/read`,
         {},
-        { headers: { Authorization: `Bearer ${user.token}` } }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
@@ -112,7 +113,7 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
           </div>
 
           <div className="relative flex-1 max-w-sm">
-            <IoSearchOutline className="absolute inset-y-0 left-3 w-4 h-4 text-gray-400" />
+            <IoSearchOutline className="absolute mt-2.5 mr-1 inset-y-0 left-3 w-4 h-4 text-gray-400" />
             <input
               type="search"
               placeholder="Tìm kiếm trên Blog..."
@@ -159,6 +160,25 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
           >
             <IoMdTrendingUp className="lg:w-6 lg:h-6 hidden lg:block" />
             <p className="mt-1 font-bold lg:text-md text-sm">Trending</p>
+          </NavLink>
+
+          {/* Follower */}
+          <NavLink
+            to="/following"
+            onClick={() => {
+              onHomeClick();
+              window.scroll({ top: 0, behavior: "smooth" });
+            }}
+            className={({ isActive }) =>
+              `flex items-center justify-center lg:w-28 w-18 h-12 gap-2 cursor-pointer transition-colors relative ${
+                isActive
+                  ? "text-blue-500 border-b-blue-500 border-b-4"
+                  : "text-gray-600 rounded-lg hover:bg-gray-100"
+              }`
+            }
+          >
+            <RiUserFollowFill className="lg:w-6 lg:h-6 hidden lg:block" />
+            <p className="mt-1 font-bold lg:text-md text-sm">Following</p>
           </NavLink>
 
           {/* Follower */}

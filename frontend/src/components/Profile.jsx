@@ -14,6 +14,10 @@ import { Trash2 } from "lucide-react";
 import EditProfile from "./EditProfile"
 import { ChevronDown } from "lucide-react";
 import { RxReset } from "react-icons/rx";
+import { CiSquarePlus } from "react-icons/ci";
+import { IoCheckmarkOutline } from "react-icons/io5";
+
+
 
 const url = "http://localhost:4000"
 const Profile = ({currentUser, setCurrentUser, onLogout}) => {
@@ -29,6 +33,8 @@ const Profile = ({currentUser, setCurrentUser, onLogout}) => {
     const [openMenuEdit, setOpenMenuEdit] = React.useState(false)
     const [openChangePassword, setOpenChangePassword] = React.useState(false)
     const [openDeleteUser, setOpenDeleteUser] = React.useState(false)
+    const [isFollow, setIsFollow] = React.useState(false)
+    
     const navigate = useNavigate()
 
     const MENU_OPTIONS = [
@@ -69,6 +75,26 @@ const Profile = ({currentUser, setCurrentUser, onLogout}) => {
         }
     }
 
+    const handleFollow = async(id) => {
+        try {
+            const {data} = await axios.post(`${url}/api/users/${id}`, {}, {headers:getAuthHeader()})
+            if(String(data.type) === "Follow") {
+                setIsFollow(true)
+                toast.success("Followed user successfully")
+            }
+            else {
+                setIsFollow(false)
+                toast.success("Unfollowed user successfully")
+            }
+            
+        }
+        catch(err) {
+            console.error("Failed to follow this user", err)
+            toast.error("Failed to follow this user")
+        }
+    }
+
+
     useEffect(() => {
         const fetchPosts = async () => {
         try {
@@ -84,7 +110,27 @@ const Profile = ({currentUser, setCurrentUser, onLogout}) => {
             setLoading(false)
         }
     }
+
+        const fetchUser = async() => {
+            try {
+                setLoading(true);
+                const{data} = await axios.get(`${url}/api/users/me`,{headers:getAuthHeader()})
+                const isFollowing = data.user.followings.some(f => f._id.toString() === userId)
+                if(isFollowing) {
+                    setIsFollow(true)
+                }
+                else setIsFollow(false)
+            }
+            catch(err) {
+                console.log("Fail to fetch user", err)
+                toast.error("Fail to load user")
+            }
+            finally{
+                setLoading(false)
+            }
+        }
         fetchPosts();
+        fetchUser()
 },[userId,currentUser])
 
      const handleAction = (action, post) => {
@@ -99,6 +145,7 @@ const Profile = ({currentUser, setCurrentUser, onLogout}) => {
 
     const user = posts.map((post) => post.author)
     const {mutate: likePost} = useLikePost(setPosts)
+
     return (
         <>
         {loading && 
@@ -107,12 +154,12 @@ const Profile = ({currentUser, setCurrentUser, onLogout}) => {
         </div>}
         
         {!loading && <div className="gap-3 flex flex-col items-center">
-            <div className="bg-white flex items-center mt-10 justify-center gap-10 w-full max-w-3xl border border-transparent rounded-3xl">
+            <div className="bg-white flex items-center mt-10 justify-evenly gap-12 w-full max-w-3xl border border-transparent rounded-3xl">
                 <div className="flex gap-5 justify-center items-center">
                     <img src={user[0]?.avatar || currentUser.avatar} alt="avatar" className="w-30 h-30 rounded-full"></img>
                     <div className="font-extrabold text-3xl text-gray-800 font-sans">{user[0]?.username || currentUser.name}</div>
                 </div>
-                {currentUser._id === userId && <div className="gap-3 flex">
+                {currentUser._id === userId ? <div className="gap-3 flex">
                     <button className="bg-blue-500 gap-2 border flex hover:cursor-pointer md:w-42 w-18 h-10 justify-center items-center border-blue-500 rounded-2xl" onClick={() => {setOpen(true), setIsUpdate(false)}}>
                         <Plus className="w-5 h-5 text-white text-center"></Plus>
                         <span className="font-sans text-white lg:block hidden font-semibold">Create a post</span>
@@ -148,7 +195,18 @@ const Profile = ({currentUser, setCurrentUser, onLogout}) => {
                                 
                             </ul>)}
                         </div>
-                </div> }
+                </div> : 
+                <button onClick={() => (handleFollow(userId))} className="rounded-xl w-32 h-12 gap-2 flex cursor-pointer items-center justify-center border bg-blue-500 text-white border-transparent font-bold text-center">
+                        {!isFollow ? (
+                        <>
+                        <CiSquarePlus className="w-8 h-8 text-white" /> Follow
+                        </>
+                    ) : (
+                        <>
+                        <IoCheckmarkOutline className="w-8 h-8 text-white" /> Following
+                        </>
+                    )}
+                </button>}
             </div>
             <span className="font-bold text-center text-4xl text-gray-700 p-5">All Posts</span>
             {posts.length == 0 && (
@@ -184,7 +242,7 @@ const Profile = ({currentUser, setCurrentUser, onLogout}) => {
                                         </div>
                                     </div>
                                     </div>
-                                    <img src={post.thumbnail || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.username || "User")}&background=random`} alt="post" className="max-w-sm p-3 lg:block hidden w-full 2xl:h-100 mb-2 h-64 object-cover rounded-xl"/>
+                                    <img src={post.thumbnail || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.username || "User")}&background=random`} alt="post" className="max-w-sm p-3  hidden lg:block w-full 2xl:h-100 mb-2 h-64 object-cover rounded-xl"/>
                                 </div>
                                 
                                 <div className="flex justify-between items-center">

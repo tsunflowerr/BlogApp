@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser, loginUser, getCurrentUser, updateUser, deleteUser, getAllUsers, changePassword } from "../controller/userController.js";
+import { registerUser, loginUser, getCurrentUser, updateUser, deleteUser, getAllUsers, changePassword, handleFollow } from "../controller/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
 
@@ -176,5 +176,7 @@ userRouter.put('/password', authMiddleware, changePassword);
  *                 $ref: '#/components/schemas/User'
  */
 userRouter.get('/all', authMiddleware, adminMiddleware, getAllUsers);
+
+userRouter.post('/:id', authMiddleware, handleFollow)
 
 export default userRouter;

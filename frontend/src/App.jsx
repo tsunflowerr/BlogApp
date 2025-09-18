@@ -80,7 +80,7 @@ const App = () => {
           <Route path="/category/:slug" element={<PostByCategory/>}/>
           <Route path="/tag/:slug" element={<PostByTag/>}/>
           <Route
-            path="/follower"
+            path="/following"
             element={
               <ProtectedRoute currentUser={currentUser}>
                 <Following />

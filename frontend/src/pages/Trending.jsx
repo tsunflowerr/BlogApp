@@ -27,7 +27,6 @@ const Trending = () => {
             return { ...post, trendingScore };
         }).sort((a, b) => b.trendingScore - a.trendingScore)
     }, [posts])
-    console.log(trendingPost.map(p => ({ id: p._id, score: p.trendingScore })))
 
 
     const postPerPage = 5; 
@@ -65,7 +64,7 @@ const Trending = () => {
     }
 
 
-        
+   
     const navigate = useNavigate();
     const {mutate: likePost} = useLikePost(setPosts)
     
@@ -77,7 +76,7 @@ const Trending = () => {
             {currentPosts.map((post) => (
                 <div key={post._id} className="bg-white border rounded-3xl border-gray-100 shadow flex flex-col shadow-gray-200 justify-start p-3">
                     <div className="gap-2 flex items-center  hover:cursor-pointer" onClick={() => navigate(`/profile/${post.author._id}`)}>
-                        <img src={post.author.avatar} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
+                        <img src={post.author.avatar || "/default-thumbnail.png"} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
                         <div className="flex flex-col gap-0 mb-1.5">
                             <span className="text-md font-semibold text-gray-700 hover:underline">{post.author.username}</span>
                             <span className="text-xs text-gray-500">{timeAgo(post.createAt)}</span>
@@ -91,7 +90,7 @@ const Trending = () => {
                     <div className="border-b-2 flex flex-col border-gray-200">
                         <div onClick={() => navigate(`/posts/${post._id}`)} className="gap-3 justify-start hover:cursor-pointer flex flex-col  pb-2">
                             <span className="text-xl font-semibold text-gray-70">{post.title}</span>
-                            <img src={post.thumbnail} alt="post" className="w-full 2xl:h-128 h-84 object-cover rounded-xl"/>
+                            <img src={post.thumbnail || "/default-thumbnail.png"} alt="post" className="w-full 2xl:h-128 h-84 object-cover rounded-xl"/>
                             <p className="text-gray-700 leading-relaxed">{post.content.length > 200 ? post.content.slice(0, 200) + "..." : post.content}</p>
                         </div>
                         <div className="mb-3  flex items-start gap-2">
@@ -118,7 +117,7 @@ const Trending = () => {
             ))}
             <div className="flex justify-center items-center gap-2 mt-5">
                 <button
-                onClick={() => setTrendingPage((p) => {Math.max(p - 1, 1), window.scroll({top: 0, behavior:"smooth"})})}
+                onClick={() => setDbPage((p) => (window.scroll({ top: 0, behavior: "smooth" }), Math.max(p - 1, 1)))}
                 disabled={trendingPage === 1}
                 className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"> Prev 
                 </button>
@@ -142,8 +141,7 @@ const Trending = () => {
         )
       )}
         <button
-          onClick={() => setTrendingPage((p) => {Math.min(p + 1, totalPages), window.scroll({top: 0, behavior:"smooth"})})}
-          disabled={trendingPage === totalPages}
+          onClick={() => setDbPage((p) => (window.scroll({ top: 0, behavior: "smooth" }), Math.min(p + 1, totalPages)))}
           className="px-3 py-1 bg-gray-200 hover:cursor-pointer rounded-md disabled:opacity-50"
         >
           Next
