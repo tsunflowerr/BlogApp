@@ -5,7 +5,7 @@ import { IoSearchOutline, IoNotifications } from "react-icons/io5";
 import { AiFillHome } from "react-icons/ai";
 import { IoMdTrendingUp } from "react-icons/io";
 import { RiUserFollowFill } from "react-icons/ri";
-import { LogOut, ChevronDown, Settings, Bell } from "lucide-react";
+import { LogOut, ChevronDown, Settings, Bell, X, Search, User, Tag, Folder, FileText } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
 
@@ -19,9 +19,23 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  
+  // Search states
+  const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState({
+    posts: [],
+    users: [],
+    categories: [],
+    tags: []
+  });
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchDebounceTimer, setSearchDebounceTimer] = useState(null);
 
   const menuref = useRef(null);
   const dropdownRef = useRef(null);
+  const searchRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   // Icon cho notification
   const getNotificationIcon = (type) => {
@@ -41,7 +55,6 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
     }
   };
 
-
   // Đánh dấu đã đọc
   const markAsRead = async (id) => {
     try {
@@ -55,6 +68,81 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
       );
     } catch (err) {
       console.error("Error marking notification as read:", err);
+    }
+  };
+
+  // Search function với debounce
+  const performSearch = async (searchQuery) => {
+    if (!searchQuery.trim()) {
+      setSearchResults({ posts: [], users: [], categories: [], tags: [] });
+      setShowSearchDropdown(false);
+      return;
+    }
+
+    try {
+      setSearchLoading(true);
+      const res = await axios.get(`${url_api}/search?query=${searchQuery}`);
+      if (res.data.success) {
+        setSearchResults(res.data);
+        setShowSearchDropdown(true);
+      }
+    } catch (err) {
+      console.error("Error searching:", err);
+      toast.error("Failed to search");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  // Handle search input change với debounce
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+
+    // Clear previous timer
+    if (searchDebounceTimer) {
+      clearTimeout(searchDebounceTimer);
+    }
+
+    // Set new timer
+    const newTimer = setTimeout(() => {
+      performSearch(value);
+    }, 500); // Debounce 500ms
+
+    setSearchDebounceTimer(newTimer);
+  };
+
+  // Handle search submit (Enter key)
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+
+    // Navigate to search results page
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+    setShowSearchDropdown(false);
+    setQuery("");
+  };
+
+  // Navigate to specific result
+  const handleResultClick = (type, item) => {
+    setShowSearchDropdown(false);
+    setQuery("");
+
+    switch (type) {
+      case "post":
+        navigate(`/posts/${item._id}`);
+        break;
+      case "user":
+        navigate(`/profile/${item._id}`);
+        break;
+      case "category":
+        navigate(`/category/${item.slug}`);
+        break;
+      case "tag":
+        navigate(`/tag/${item.slug}`);
+        break;
+      default:
+        break;
     }
   };
 
@@ -79,7 +167,10 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
     };
 
     fetchNotifications();
+  }, [user]);
 
+  // Handle click outside
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuref.current && !menuref.current.contains(event.target)) {
         setMenuOpen(false);
@@ -87,11 +178,23 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpen(false);
       }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchDropdown(false);
+      }
     };
-    document.addEventListener("mousedown", handleClickOutside);
 
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [user]);
+  }, []);
+
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchDebounceTimer) {
+        clearTimeout(searchDebounceTimer);
+      }
+    };
+  }, [searchDebounceTimer]);
 
   return (
     <header className="sticky top-0 bg-white shadow-sm font-sans border-b border-gray-200 z-50">
@@ -112,13 +215,162 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
             </span>
           </div>
 
-          <div className="relative flex-1 max-w-sm">
-            <IoSearchOutline className="absolute mt-2.5 mr-1 inset-y-0 left-3 w-4 h-4 text-gray-400" />
-            <input
-              type="search"
-              placeholder="Tìm kiếm trên Blog..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-gray-100 focus:bg-white text-sm"
-            />
+          {/* Search Bar with Dropdown */}
+          <div ref={searchRef} className="relative flex-1 max-w-sm">
+            <form onSubmit={handleSearchSubmit}>
+              <IoSearchOutline className="absolute mt-2.5 mr-1 inset-y-0 left-3 w-4 h-4 text-gray-400" />
+              <input
+                ref={searchInputRef}
+                type="search"
+                value={query}
+                onChange={handleSearchInputChange}
+                placeholder="Tìm kiếm trên Blog..."
+                className="w-full pl-10 pr-10 py-2 bg-gray-100 rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:bg-white text-sm transition-all"
+              />
+            </form>
+
+            {/* Search Results Dropdown */}
+            {showSearchDropdown && (
+              <div className="absolute top-full mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-200 max-h-96 overflow-y-auto">
+                {searchLoading ? (
+                  <div className="p-4 text-center text-gray-500">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                    <p className="mt-2 text-sm">Đang tìm kiếm...</p>
+                  </div>
+                ) : (
+                  <div className="py-2">
+                    {/* Posts Results */}
+                    {searchResults.posts?.length > 0 && (
+                      <div className="px-3 pb-2">
+                        <div className="flex items-center gap-2 text-xs text-gray-500 font-semibold mb-2">
+                          <FileText className="w-3 h-3" />
+                          BÀI VIẾT
+                        </div>
+                        {searchResults.posts.slice(0,5).map((post) => (
+                          <div
+                            key={post._id}
+                            onClick={() => handleResultClick("post", post)}
+                            className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <div className="flex-1">
+                              <p className="font-medium text-sm text-gray-800 line-clamp-1">
+                                {post.title}
+                              </p>
+                              <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                                <User className="w-3 h-3" />
+                                {post.author?.username}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Users Results */}
+                    {searchResults.users?.length > 0 && (
+                      <div className="px-3 pb-2 border-t border-gray-100 pt-2">
+                        <div className="flex items-center gap-2 text-xs text-gray-500 font-semibold mb-2">
+                          <User className="w-3 h-3" />
+                          NGƯỜI DÙNG
+                        </div>
+                        {searchResults.users.slice(0,5).map((user) => (
+                          <div
+                            key={user._id}
+                            onClick={() => handleResultClick("user", user)}
+                            className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-full overflow-hidden">
+                              {user.avatar ? (
+                                <img
+                                  src={user.avatar}
+                                  alt={user.username}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                                  {user.username[0]?.toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            <p className="text-sm font-medium text-gray-800">
+                              {user.username}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Categories Results */}
+                    {searchResults.categories?.length > 0 && (
+                      <div className="px-3 pb-2 border-t border-gray-100 pt-2">
+                        <div className="flex items-center gap-2 text-xs text-gray-500 font-semibold mb-2">
+                          <Folder className="w-3 h-3" />
+                          DANH MỤC
+                        </div>
+                        {searchResults.categories.slice(0,5).map((category) => (
+                          <div
+                            key={category._id}
+                            onClick={() => handleResultClick("category", category)}
+                            className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <Folder className="w-4 h-4 text-blue-500" />
+                            <p className="text-sm text-gray-800">{category.name}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Tags Results */}
+                    {searchResults.tags?.length > 0 && (
+                      <div className="px-3 pb-2 border-t border-gray-100 pt-2">
+                        <div className="flex items-center gap-2 text-xs text-gray-500 font-semibold mb-2">
+                          <Tag className="w-3 h-3" />
+                          THẺ
+                        </div>
+                        {searchResults.tags.slice(0,5).map((tag) => (
+                          <div
+                            key={tag._id}
+                            onClick={() => handleResultClick("tag", tag)}
+                            className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <Tag className="w-4 h-4 text-green-500" />
+                            <p className="text-sm text-gray-800">{tag.name}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* No Results */}
+                    {!searchResults.posts?.length && 
+                     !searchResults.users?.length && 
+                     !searchResults.categories?.length && 
+                     !searchResults.tags?.length && (
+                      <div className="p-8 text-center">
+                        <Search className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                        <p className="text-gray-500 text-sm">
+                          Không tìm thấy kết quả cho "{query}"
+                        </p>
+                      </div>
+                    )}
+
+                    {/* View All Results */}
+                    {query && (searchResults.posts?.length > 0 || 
+                     searchResults.users?.length > 0 || 
+                     searchResults.categories?.length > 0 || 
+                     searchResults.tags?.length > 0) && (
+                      <div className="border-t border-gray-100 p-2">
+                        <button
+                          onClick={handleSearchSubmit}
+                          className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium py-2 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                          Xem tất cả kết quả cho "{query}"
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -162,7 +414,7 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
             <p className="mt-1 font-bold lg:text-md text-sm">Trending</p>
           </NavLink>
 
-          {/* Follower */}
+          {/* Following */}
           <NavLink
             to="/following"
             onClick={() => {
@@ -228,7 +480,10 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
                         {notifications.slice(0,7).map((notification) => (
                           <div
                             key={notification._id}
-                            onClick={() => {markAsRead(notification._id), navigate(`/posts/${notification.postId}`)}}
+                            onClick={() => {
+                              markAsRead(notification._id);
+                              navigate(`/posts/${notification.postId}`);
+                            }}
                             className={`p-3 hover:bg-gray-100 cursor-pointer transition-colors ${
                               !notification.isRead ? "bg-blue-50" : ""
                             }`}

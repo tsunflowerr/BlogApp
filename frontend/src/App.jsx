@@ -17,13 +17,36 @@ import SimpleLayout from "./components/layout/SimpleLayout.jsx"
 import PostDetail from "./pages/PostDetail.jsx";
 import PostByCategory from "./pages/PostByCategory.jsx";
 import PostByTag from "./pages/PostByTag.jsx";
+import SearchPage from "./pages/SearchPage.jsx";
+import {jwtDecode} from "jwt-decode"
 
 const App = () => {
+
+   const isTokenExpired = (token) => {
+    try {
+      const decoded = jwtDecode(token);
+      if(!decoded.exp) return true;
+      return decoded.exp * 1000 < Date.now();
+    
+    }
+    catch(error) {
+      console.error("Error decoding token:", error);
+      return true;
+    }
+  }
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(() => {
     const stored = localStorage.getItem("currentUser");
-    return stored ? JSON.parse(stored) : null;
-  });
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (isTokenExpired(parsed.token)) {
+        localStorage.removeItem("currentUser");
+        return null;
+      }
+      return parsed;
+    }
+    return null;
+});
 
   useEffect(() => {
     if(currentUser) {
@@ -34,6 +57,8 @@ const App = () => {
     }
 
   }, [currentUser]);
+
+
   const handleAuthSubmit = (data) => {
     const userData = {
       email: data.email,
@@ -91,6 +116,7 @@ const App = () => {
         <Route element={<SimpleLayout user={currentUser} onLogout={handleLogout} />}>
             <Route path="/profile/:userId" element={<Profile currentUser={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout}/>}/>
             <Route path="/posts/:postId" element={<PostDetail user={currentUser}/>} />
+            <Route path="/search" element={<SearchPage currentUser={currentUser}/>}/>
         </Route>
       </Routes>
     </>
