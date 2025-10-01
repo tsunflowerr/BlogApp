@@ -228,4 +228,17 @@ export async function handleFollow(req, res) {
   }
 }
 
-
+export async function getUserById(req, res) {
+    try {
+        const userId = req.params.id;
+        const user = await User.findById(userId).select('username email avatar followers followings').populate("followers", "username email avatar").populate("followings", "username email avatar");
+        if(!user) {
+            return res.status(404).json({success:false, message:'User not found'})
+        }
+        res.status(200).json({success:true, user});
+    }
+    catch(error) {
+        console.log('Error fetching user by id:', error);
+        res.status(500).json({success: false, message: 'Server error'});
+    }
+}

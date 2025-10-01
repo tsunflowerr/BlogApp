@@ -62,7 +62,7 @@ const App = () => {
   const handleAuthSubmit = (data) => {
     const userData = {
       email: data.email,
-      name: data.username || "User",
+      username: data.username || "User",
       avatar: data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || "User")}&background=random`,
       token: data.token,
       _id : data._id

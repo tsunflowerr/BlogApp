@@ -273,27 +273,27 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
                           <User className="w-3 h-3" />
                           NGƯỜI DÙNG
                         </div>
-                        {searchResults.users.slice(0,5).map((user) => (
+                        {searchResults.users.slice(0,5).map((targetuser) => (
                           <div
-                            key={user._id}
-                            onClick={() => handleResultClick("user", user)}
+                            key={targetuser._id}
+                            onClick={() => handleResultClick("user", targetuser)}
                             className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
                           >
                             <div className="w-8 h-8 rounded-full overflow-hidden">
-                              {user.avatar ? (
+                              {targetuser.avatar ? (
                                 <img
-                                  src={user.avatar}
-                                  alt={user.username}
+                                  src={targetuser.avatar}
+                                  alt={targetuser.username}
                                   className="w-full h-full object-cover"
                                 />
                               ) : (
                                 <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
-                                  {user.username[0]?.toUpperCase()}
+                                  {targetuser.username[0]?.toUpperCase()}
                                 </div>
                               )}
                             </div>
                             <p className="text-sm font-medium text-gray-800">
-                              {user.username}
+                              {targetuser.username}
                             </p>
                           </div>
                         ))}

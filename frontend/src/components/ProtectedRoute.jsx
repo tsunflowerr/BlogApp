@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children, currentUser }) => {
       navigate("/login", { state: { from: location.pathname }, replace: true });
     }, 3000);
 
-    return () => clearTimeout(timer); // clear nếu component unmount
+    return () => clearTimeout(timer);
   }
 }, [currentUser, navigate, location.pathname]);
 

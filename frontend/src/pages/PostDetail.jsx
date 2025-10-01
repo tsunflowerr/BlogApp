@@ -60,14 +60,14 @@ const PostDetail = ({ user }) => {
         const slug = post.category[0].slug;
         fetchRecommentPost(slug);
     }
-    }, [post]);
+    }, [post?._id]);
 
     useEffect(() => {
     if (window.location.hash === "#comments") {
         const el = document.getElementById("comments");
         if (el) el.scrollIntoView({ behavior: "smooth" });
     }
-    }, [post]); 
+    }, [post?._id]); 
 
 
     const handleShowAuth = () => {
@@ -76,7 +76,8 @@ const PostDetail = ({ user }) => {
         }
     }
 
-    const addComment = async() => {
+    const addComment = async(e) => {
+        e.preventDefault();
         if(!inputComment.trim()){
             toast.warning("Comment canot be empty")
             return;
@@ -87,7 +88,7 @@ const PostDetail = ({ user }) => {
             if(data.success) {
                 setInputComment("")
                 toast.success("Comment added successfully")
-                fetchPost()
+                setPost(prev => ({...prev, comments: [{...data.comment, author: user}, ...prev.comments]}))
             }
         }
         catch(err) {
@@ -96,6 +97,7 @@ const PostDetail = ({ user }) => {
         }
     }
 
+    console.log("post", post)
     const handleNavigateProfile = () => {
         if (post.author?._id) {
             navigate(`/profile/${post.author._id}`);
@@ -152,8 +154,7 @@ const PostDetail = ({ user }) => {
                     ))}
                 </div>
 
-                <div className="font-sans text-[18px] leading-8 text-gray-800 text-justify border-b-blue-200 border-b pb-5">
-                    {post.content}
+                <div className="font-sans text-[18px] leading-8 text-gray-800 text-justify border-b-blue-200 border-b pb-5" dangerouslySetInnerHTML={{ __html: post.content }}>
                 </div>
 
                 <div id="comments" className="flex flex-col gap-3 border-b border-b-gray-300 pb-5">
@@ -174,15 +175,15 @@ const PostDetail = ({ user }) => {
                             </div>
                         )}
                     </div>
-                    <button onClick={() => addComment()} className="border justify-start max-w-36 text-white bg-blue-600 rounded-lg px-4 py-2 font-medium cursor-pointer hover:bg-blue-700 transition-colors">Comment</button>
+                    <button onClick={(e) => addComment(e)} className="border justify-start max-w-36 text-white bg-blue-600 rounded-lg px-4 py-2 font-medium cursor-pointer hover:bg-blue-700 transition-colors">Comment</button>
                 </div>
                 <div className="flex flex-col gap-3">
                     {post?.comments?.slice(0, visibleComments).map((cmt) => (
                         <div key={cmt._id} className="flex flex-col border-b border-gray-200">
                             <div className="flex gap-3 items-center">
                                 <img className="w-10 h-10 rounded-full" src={cmt.author?.avatar}></img>
-                                <span className="font-sans font-semibold cursor-pointer hover:underline hover:text-blue-500 text-[16px] text-gray-800" onClick ={() => navigate(`/profile/${cmt.author?._id}`)}>{cmt.author?.username}</span>
-                                <div className="font-sans text-xs font-semibold text-gray-400">{timeAgo(cmt.createAt)}</div>
+                                <span className="font-sans font-semibold cursor-pointer hover:underline hover:text-blue-500 text-[16px] text-gray-800" onClick ={() => navigate(`/profile/${cmt.author?._id}`)}>{cmt.author?.username || cmt?.author.name}</span>
+                                <div className="font-sans text-xs font-semibold text-gray-400">{timeAgo(cmt?.createAt)}</div>
                             </div>
                             <h2 className="font-sans px-12 pb-2 text-gray-600 text-justify leading-8">
                                 {cmt.content}
