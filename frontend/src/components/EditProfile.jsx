@@ -9,9 +9,9 @@ import { Mail } from "lucide-react";
 const url_api = "http://localhost:4000/api"
 const EditProfile = ({currentUser, setCurrentUser, openEdit, closeEdit, openChangePassword, closeChangePassword, openDeleteUser, closeDeleteUser, onLogout}) => {
     const [profile, setProfile] = React.useState({
-  username: currentUser.name, 
-  email: currentUser.email,
-  avatar: currentUser.avatar
+  username: currentUser?.name, 
+  email: currentUser?.email,
+  avatar: currentUser?.avatar
 })
     const [inputDelete, setInputDelete] = React.useState("")
     const [password, setPassword] = React.useState({current:"", new:"", confirm:""})

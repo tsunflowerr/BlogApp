@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser, loginUser, getCurrentUser, updateUser, deleteUser, getAllUsers, changePassword, handleFollow, getUserById} from "../controller/userController.js";
+import { registerUser, loginUser, getCurrentUser, updateUser, deleteUser, getAllUsers, changePassword, handleFollow, getUserBookMarks, addRemoveBookMark, getUserById} from "../controller/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
 
@@ -113,25 +113,7 @@ userRouter.put('/me', authMiddleware, updateUser);
  */
 userRouter.delete('/me', authMiddleware, deleteUser);
 
-/**
- * @swagger
- * /users/{id}:
- *   delete:
- *     summary: Xóa user theo id (admin)
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: User đã bị xóa
- */
-userRouter.delete('/:id', authMiddleware,adminMiddleware, deleteUser);
+
 
 /**
  * @swagger
@@ -175,9 +157,31 @@ userRouter.put('/password', authMiddleware, changePassword);
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-
+userRouter.get('/bookmarks', authMiddleware, getUserBookMarks)
+userRouter.post('/bookmarks', authMiddleware, addRemoveBookMark)
 userRouter.get('/all', authMiddleware, adminMiddleware, getAllUsers);
-userRouter.post('/:id', authMiddleware, handleFollow)
+userRouter.post('/:id/follow', authMiddleware, handleFollow)
 userRouter.get('/:id', getUserById)
+/**
+ * @swagger
+ * /users/{id}:
+ *   delete:
+ *     summary: Xóa user theo id (admin)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User đã bị xóa
+ */
+userRouter.delete('/:id', authMiddleware,adminMiddleware, deleteUser);
+
+
 
 export default userRouter;

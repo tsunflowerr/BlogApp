@@ -136,7 +136,7 @@ const PostDetail = ({ user }) => {
                             <div className="gap-1 flex font-semibold text-center">
                                 <GrView className="w-5 h-5 m-0.5"/>{post.view}
                             </div>
-                            <div className={`text-md flex font-semibold gap-1 hover:cursor-pointer hover:bg-gray-200 hover:scale-105 hover:rounded-md ${post.likes?.includes(user?._id) ? "text-blue-600 font-semibold" : "text-black"}`} onClick={() => likePost({postId: post._id, token: user.token})}>
+                            <div className={`text-md flex font-semibold gap-1 hover:cursor-pointer hover:bg-gray-200 hover:scale-105 hover:rounded-md ${post.likes?.includes(user?._id) ? "text-blue-600 font-semibold" : "text-black"}`} onClick={() => likePost({postId: post._id, token: user?.token})}>
                                 <GrLike className="w-5 h-5 m-0.5"/>{post.likeCount}
                             </div>
                             <div className="gap-1 flex font-semibold text-center">
@@ -210,9 +210,7 @@ const PostDetail = ({ user }) => {
                                 <span className="text-xl font-semibold text-gray-800">
                                     {post.title}
                                 </span>
-                                <p className="text-gray-600 font-sans text-sm line-clamp-3">
-                                    {post.content.length > 120 ? post.content.slice(0, 120) + "..." : post.content}
-                                </p>
+                                <p className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{__html: post.content.length > 200 ? post.content.slice(0, 200) + "..." : post.content}}></p>
                             </div>
                         </div>)
                     ))}

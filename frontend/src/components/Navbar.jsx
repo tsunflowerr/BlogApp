@@ -40,7 +40,7 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
   // Icon cho notification
   const getNotificationIcon = (type) => {
     switch (type) {
-      case "friend_request":
+      case "follow":
         return "👤";
       case "comment":
         return "💬";
@@ -198,9 +198,9 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
 
   return (
     <header className="sticky top-0 bg-white shadow-sm font-sans border-b border-gray-200 z-50">
-      <div className="px-4 md:px-6 w-full mx-auto items-center flex">
+      <div className="px-4 md:px-6 w-full mx-auto items-center justify-around flex">
         {/* Logo + Search */}
-        <div className="flex py-2 items-center md:gap-5 gap-1 flex-1">
+        <div className="flex py-2 items-center md:gap-5 gap-1 ">
           <div
             className="flex items-center gap-2 cursor-pointer group"
             onClick={() => {
@@ -374,7 +374,7 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-1 lg:gap-10 pt-2 flex-1 2xl:mr-60">
+        <div className=" flex items-center gap-1 lg:gap-8 pt-2 mr-10 ml-10">
           {/* Home */}
           <NavLink
             to="/"
@@ -482,7 +482,7 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
                             key={notification._id}
                             onClick={() => {
                               markAsRead(notification._id);
-                              navigate(`/posts/${notification.postId}`);
+                              notification.type === "follow" ? navigate(`/profile/${notification.user._id}`) : navigate(`/posts/${notification.postId}`);
                             }}
                             className={`p-3 hover:bg-gray-100 cursor-pointer transition-colors ${
                               !notification.isRead ? "bg-blue-50" : ""
@@ -495,7 +495,7 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
                                   {notification.user.avatar ? (
                                     <img
                                       src={notification.user.avatar}
-                                      alt={notification.user.name}
+                                      alt={notification.user.username}
                                       className="w-full h-full object-cover"
                                     />
                                   ) : (
@@ -558,7 +558,7 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
                       />
                     ) : (
                       <div className="w-9 h-9 flex items-center justify-center bg-gradient-to-br from-fuchsia-500 to-purple-600 text-white font-semibold shadow-md rounded-full">
-                        {user.name?.[0]?.toUpperCase() || "U"}
+                        {user.username?.[0]?.toUpperCase() || "U"}
                       </div>
                     )}
                     <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
@@ -566,7 +566,7 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
 
                   <div className="hidden md:block text-left">
                     <p className="text-sm font-medium text-gray-800">
-                      {user.name}
+                      {user.username}
                     </p>
                     <p className="text-xs text-gray-500">{user.email}</p>
                   </div>

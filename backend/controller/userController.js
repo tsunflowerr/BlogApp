@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import e from 'express';
 import Post from '../models/postModel.js'
 import Comment from "../models/commentModel.js"
+import Notification from '../models/notificationModel.js';
 
 const JWT_SECRET = process.env.JWT_SECRET   || 'your_jwt_secret_key';
 const JWT_EXPIRES_IN = "24h"; // Token expiration time
@@ -210,8 +211,16 @@ export async function handleFollow(req, res) {
 
     const isFollowing = targetUser.followers.some(f => f.toString() === currentUserId);
     if (!isFollowing) {
-      targetUser.followers.push(currentUserId);
-      currentUser.followings.push(targetUserId);
+      targetUser.followers.push(currentUser._id);
+      currentUser.followings.push(targetUser._id);
+      const notification = new Notification({
+        postId : null,
+        author :targetUserId,
+        user :currentUserId,
+        type   : "follow",
+        content : "started following you",
+      })
+      await notification.save();
       await targetUser.save();
       await currentUser.save();
       return res.status(200).json({ success: true, type:"Follow", message: "Followed user successfully" });
@@ -239,6 +248,60 @@ export async function getUserById(req, res) {
     }
     catch(error) {
         console.log('Error fetching user by id:', error);
+        res.status(500).json({success: false, message: 'Server error'});
+    }
+}
+
+export async function getUserBookMarks(req, res) {
+    try {
+        const userId = req.user._id || req.user.id;
+        const user = await User.findById(userId)
+        .select('bookmarks')
+        .populate({
+            path: 'bookmarks',
+            select: "title content author tags category thumbnail likeCount likes comments",
+            populate: [
+                { path: 'author', select: 'username avatar' },
+                { path: 'tags', select: 'name slug' },
+                { path: 'category', select: 'name slug' }
+            ]
+        });
+        if(!user) {
+            return res.status(404).json({success:false, message:"User not found"})
+        }
+        res.status(200).json({success:true, bookmarks: user.bookmarks});
+    }
+    catch(error) {
+        console.log('Error fetching user bookmarks:', error);
+        res.status(500).json({success: false, message: 'Server error'});
+    }
+}
+
+export async function addRemoveBookMark(req, res) {
+    try {
+        const userId = req.user.id || req.user._id;
+        const postId = req.body.postId;
+        if(!postId) {
+            return res.status(400).json({success:false, message:"PostId is required"})
+        }
+        const user = await User.findById(userId);
+        if(!user) {
+            return res.status(404).json({success:false, message:"User not found"})
+        }
+        const isBookmarked = user.bookmarks.some(b => b.toString() === postId);
+        if(isBookmarked) {
+            user.bookmarks = user.bookmarks.filter(b => b.toString() !== postId);
+            await user.save();
+            return res.status(200).json({success:true, type:"Remove", message:"Removed bookmark successfully"})
+        }
+        else {
+            user.bookmarks.push(postId);
+            await user.save();
+            return res.status(200).json({success:true, type:"Add", message:"Added bookmark successfully"})
+        }
+    }
+    catch(error) {
+        console.log('Error adding bookmark:', error);
         res.status(500).json({success: false, message: 'Server error'});
     }
 }
