@@ -18,6 +18,7 @@ import PostDetail from "./pages/PostDetail.jsx";
 import PostByCategory from "./pages/PostByCategory.jsx";
 import PostByTag from "./pages/PostByTag.jsx";
 import SearchPage from "./pages/SearchPage.jsx";
+import Analytics from "./pages/Analytics.jsx";
 import {jwtDecode} from "jwt-decode"
 
 const App = () => {
@@ -117,6 +118,14 @@ const App = () => {
             <Route path="/profile/:userId" element={<Profile currentUser={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout}/>}/>
             <Route path="/posts/:postId" element={<PostDetail user={currentUser}/>} />
             <Route path="/search" element={<SearchPage currentUser={currentUser}/>}/>
+            <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute currentUser={currentUser} onLogout={handleLogout}>
+                <Analytics/>
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </>

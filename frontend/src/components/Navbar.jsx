@@ -8,6 +8,7 @@ import { RiUserFollowFill } from "react-icons/ri";
 import { LogOut, ChevronDown, Settings, Bell, X, Search, User, Tag, Folder, FileText } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { IoMdAnalytics } from "react-icons/io";
 
 const url_api = "http://localhost:4000/api";
 
@@ -433,9 +434,9 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
             <p className="mt-1 font-bold lg:text-md text-sm">Following</p>
           </NavLink>
 
-          {/* Follower */}
+          {/* analytics */}
           <NavLink
-            to="/follower"
+            to="/analytics"
             onClick={() => {
               onHomeClick();
               window.scroll({ top: 0, behavior: "smooth" });
@@ -448,8 +449,8 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
               }`
             }
           >
-            <RiUserFollowFill className="lg:w-6 lg:h-6 hidden lg:block" />
-            <p className="mt-1 font-bold lg:text-md text-sm">Follower</p>
+            <IoMdAnalytics className="lg:w-6 lg:h-6 hidden lg:block" />
+            <p className="mt-1 font-bold lg:text-md text-sm">Analytics</p>
           </NavLink>
         </div>
 

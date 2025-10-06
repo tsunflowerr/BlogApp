@@ -102,12 +102,12 @@ const PostCard = ({ post, timeAgo, user, onLike, onBookmark, userBookmarks = [] 
                         {post.comments.length} Comments
                     </span>
                 </div>
-                <div className="flex justify-center items-center mt-4 mr-5">
+                {user && <div className="flex justify-center items-center mt-4 mr-5">
                     <BookmarkButton
                         isBookmarked={userBookmarks.includes(post._id)}
                         onClick={() => onBookmark && onBookmark(post._id)}
                     />
-                </div>
+                </div> }
             </div>
         </div>
     );
