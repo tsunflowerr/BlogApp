@@ -8,7 +8,7 @@ import { AiOutlineLike } from "react-icons/ai";
 const url ="http://localhost:4000";
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
-const Analytics = () => {
+const Analytics = (currentUser) => {
 const [timeFilter, setTimeFilter] = useState('all'); // 'all', '24h', '7d', '30d'
 const [postData, setPostData] = React.useState([]);
 const [loading, setLoading] = React.useState(false);
@@ -20,7 +20,7 @@ useEffect(() => {
         try {
             const token = localStorage.getItem("token");
             if(!token) throw new Error("No token found");
-            const {data} = await axios.get(`${url}/api/posts`, {
+            const {data} = await axios.get(`${url}/api/posts/user/${currentUser.currentUser._id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

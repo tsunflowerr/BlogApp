@@ -121,8 +121,8 @@ const App = () => {
             <Route
             path="/analytics"
             element={
-              <ProtectedRoute currentUser={currentUser} onLogout={handleLogout}>
-                <Analytics/>
+              <ProtectedRoute currentUser={currentUser}>
+                <Analytics currentUser={currentUser} />
               </ProtectedRoute>
             }
           />
