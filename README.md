@@ -203,33 +203,66 @@ http://localhost:4000/api-docs
 
 ## 📸 Screenshots
 
-### Login Page
-![Login](<img width="1920" height="1032" alt="{441737B5-FB21-4A44-A76D-5A49BD176D65}" src="https://github.com/user-attachments/assets/72042d91-cc76-47f7-853a-6137646d2a45" />)
-*Secure authentication page with JWT token-based login, featuring email and password fields, gradient background (green to sky), and options to switch to signup*
+## Login Page
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/72042d91-cc76-47f7-853a-6137646d2a45" alt="Login" width="800"/>
+</p>
 
-### Dashboard
-![Dashboard](<img width="1920" height="1032" alt="{DB9A7EC9-762E-4A72-B5A4-8393F3B95483}" src="https://github.com/user-attachments/assets/2b8a5b1e-8a1d-451b-9125-6e15e485dea6" />)
-*Main dashboard with post creation and feed*
+*Secure authentication page with JWT token-based login, featuring email and password fields, gradient background (green to sky), and options to switch to signup.*
 
-### Post Detail
-![Post Detail](<img width="1920" height="1032" alt="{1A29D6AF-A6D7-4624-A6CA-2F517E6A471A}" src="https://github.com/user-attachments/assets/92810a96-e02f-4adb-8187-e63fca0dc348" />)
-*Detailed post view with comments and interactions*
+---
 
-### Analytics
-![Analytics](<img width="1920" height="1032" alt="{47E7F834-50B0-4D89-A785-51621FBD14BE}" src="https://github.com/user-attachments/assets/b204843e-5f28-4ca8-a415-21de86e02385" />)
-*Comprehensive analytics with charts and metrics*
+## Dashboard
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2b8a5b1e-8a1d-451b-9125-6e15e485dea6" alt="Dashboard" width="800"/>
+</p>
 
-### Trending
-![Trending](<img width="1920" height="1032" alt="{45606401-A3D1-4AC9-8A6E-7F35E48D42D9}" src="https://github.com/user-attachments/assets/2d422eb5-4596-4ff5-9c33-f55b681dc96d" />)
-*Discover trending posts based on engagement*
+*Main dashboard with post creation and feed.*
 
-### Profile
-![Profile](<img width="1920" height="1032" alt="{1C3C3C65-836A-4B0C-82C2-DA0C7C378ABD}" src="https://github.com/user-attachments/assets/e9d3d87c-3ea5-4a42-b39a-4e5a15fe0768" />)
-*User profile with posts and followers*
+---
 
-### Search
-![Search](<img width="1920" height="1032" alt="{EA768B7D-664E-44E8-8F8C-2A4F56E338E4}" src="https://github.com/user-attachments/assets/6130a7b5-5a72-42b8-9161-a3d678d0e2c2" />)
-*Global search across all content types*
+## Post Detail
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/92810a96-e02f-4adb-8187-e63fca0dc348" alt="Post Detail" width="800"/>
+</p>
+
+*Detailed post view with comments and interactions.*
+
+---
+
+## Analytics
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b204843e-5f28-4ca8-a415-21de86e02385" alt="Analytics" width="800"/>
+</p>
+
+*Comprehensive analytics with charts and metrics.*
+
+---
+
+## Trending
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2d422eb5-4596-4ff5-9c33-f55b681dc96d" alt="Trending" width="800"/>
+</p>
+
+*Discover trending posts based on engagement.*
+
+---
+
+## Profile
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/e9d3d87c-3ea5-4a42-b39a-4e5a15fe0768" alt="Profile" width="800"/>
+</p>
+
+*User profile with posts and followers.*
+
+---
+
+## Search
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6130a7b5-5a72-42b8-9161-a3d678d0e2c2" alt="Search" width="800"/>
+</p>
+
+*Global search across all content types.*
 
 ## 🔑 Key Features Explained
 
