@@ -10,7 +10,7 @@ import Trending from "./pages/Trending.jsx";
 import { Navigate } from "react-router-dom";
 import Following from "./pages/Following.jsx";
 import Layout from "./components/layout/MainLayout.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import { ToastContainer } from "react-toastify";
 import Profile from "./components/Profile.jsx";
 import SimpleLayout from "./components/layout/SimpleLayout.jsx"
@@ -60,20 +60,22 @@ const App = () => {
   }, [currentUser]);
 
 
-  const handleAuthSubmit = (data) => {
-    const userData = {
-      email: data.email,
-      username: data.username || "User",
-      avatar: data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || "User")}&background=random`,
-      token: data.token,
-      _id : data._id
+    const handleAuthSubmit = (data) => {
+      const userData = {
+        email: data.email,
+        username: data.username || "User",
+        avatar: data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username || "User")}&background=random`,
+        token: data.token,
+        _id : data._id,
+        isAdmin: data.isAdmin
+      }
+      setCurrentUser(userData);
     }
-    setCurrentUser(userData);
-  }
 
   const handleLogout = () => {
     localStorage.removeItem("token")
     localStorage.removeItem("userId")
+    localStorage.removeItem("currentUser")
     setCurrentUser(null)
     navigate('/');
   }

@@ -65,6 +65,8 @@ const EditProfile = ({currentUser, setCurrentUser, openEdit, closeEdit, openChan
                     name: data.user.username,
                     email: data.user.email,
                     avatar: data.user.avatar,
+                    isAdmin: data.user.isAdmin,
+                    _id: data.user._id
 
                 }))
                 toast.success("User update successfully")

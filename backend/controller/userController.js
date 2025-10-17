@@ -73,7 +73,9 @@ export async function loginUser(req, res) {
             user: {
                 id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                avatar: user.avatar,
+                isAdmin: user.isAdmin
             }
         })
     }
@@ -85,7 +87,7 @@ export async function loginUser(req, res) {
 
 export async function getCurrentUser(req, res) {
     try {
-        const user = await User.findById(req.user.id).select('username email avatar followers followings').populate("followers", "username email avatar").populate("followings", "username email avatar");
+        const user = await User.findById(req.user.id).select('username email avatar isAdmin followers followings').populate("followers", "username email avatar").populate("followings", "username email avatar");
         if(!user) {
             return res.status(404).json({success:false, message:'User not found'})
         }

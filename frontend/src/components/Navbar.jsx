@@ -9,6 +9,7 @@ import { LogOut, ChevronDown, Settings, Bell, X, Search, User, Tag, Folder, File
 import { toast } from "react-toastify";
 import axios from "axios";
 import { IoMdAnalytics } from "react-icons/io";
+import { MdAdminPanelSettings } from "react-icons/md";
 
 const url_api = "http://localhost:4000/api";
 
@@ -94,6 +95,8 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
       setSearchLoading(false);
     }
   };
+
+  
 
   // Handle search input change với debounce
   const handleSearchInputChange = (e) => {
@@ -196,7 +199,6 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
       }
     };
   }, [searchDebounceTimer]);
-
   return (
     <header className="sticky top-0 bg-white shadow-sm font-sans border-b border-gray-200 z-50">
       <div className="px-4 md:px-6 w-full mx-auto items-center justify-around flex">
@@ -593,6 +595,12 @@ const Navbar = ({ user = null, onLogout, onHomeClick, timeAgo }) => {
                         Profile Settings
                       </button>
                     </li>
+                    {user?.isAdmin && <li className="p-2">
+                      <button onClick={() => {setOpen(false),navigate('/admin')}} className="w-full px-4 py-2.5 text-left hover:bg-purple-50 text-sm text-gray-700 flex items-center gap-2">
+                        <MdAdminPanelSettings className="w-4 h-4" />
+                        Admin Panel
+                      </button>
+                    </li>}
                     <li className="p-2">
                       <button
                         onClick={onLogout}

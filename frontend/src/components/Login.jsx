@@ -56,11 +56,11 @@ const Login = ({onSubmit, onSwitchMode}) => {
         try {
             const {data} = await axios.post(`${url}/api/users/login`, formData);
             if(!data.token) throw new Error(data.message || "Login failed. Please try again");
-
+            console.log("Login response data:", data);
             localStorage.setItem("token", data.token);
             localStorage.setItem("userId", data.user.id)
             setFormData(INITIAL_FORM)
-            onSubmit?.({token:data.token, userId:data.user.id, ...data.user});
+            onSubmit?.({token:data.token, _id:data.user.id, isAdmin: data.user.isAdmin, ...data.user});
             toast.success("Login successful")
             navigate(from, {replace: true})
         }
